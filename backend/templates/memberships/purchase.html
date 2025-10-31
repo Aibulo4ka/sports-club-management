@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Покупка абонемента - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts_web:home' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'memberships_web:catalog' %}">Абонементы</a></li>
+                    <li class="breadcrumb-item active">Покупка</li>
+                </ol>
+            </nav>
+
+            <h1 class="mb-4"><i class="bi bi-cart-check"></i> Покупка абонемента</h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Детали заказа</h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Membership Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">{{ membership_type.name }}</h5>
+                            {% if membership_type.description %}
+                                <p class="text-muted">{{ membership_type.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <dl>
+                                <dt class="text-muted">Длительность:</dt>
+                                <dd><strong>{{ membership_type.duration_days }}</strong> дней</dd>
+
+                                <dt class="text-muted">Посещения:</dt>
+                                <dd>
+                                    {% if membership_type.visits_limit %}
+                                        <strong>{{ membership_type.visits_limit }}</strong> посещений
+                                    {% else %}
+                                        <strong>Безлимит</strong>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Client Info -->
+                    <div class="mb-4">
+                        <h5>Клиент</h5>
+                        <p class="mb-1">
+                            <strong>{{ user.get_full_name|default:user.username }}</strong>
+                        </p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-envelope"></i> {{ user.email }}
+                        </p>
+                        <p class="text-muted">
+                            <i class="bi bi-telephone"></i> {{ client.profile.phone }}
+                        </p>
+
+                        {% if client.is_student %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-mortarboard"></i> Студент
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Price Breakdown -->
+                    <div class="mb-4">
+                        <h5>Расчёт стоимости</h5>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="text-muted">Базовая цена:</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p>
+                                    {% if price_info.discount_amount != '0.00' %}
+                                        <s>{{ price_info.base_price }} ₽</s>
+                                    {% else %}
+                                        {{ price_info.base_price }} ₽
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        {% if price_info.discount_amount != '0.00' %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="text-success">
+                                        <i class="bi bi-tag"></i> Скидка ({{ price_info.discount_percentage }}%):
+                                    </p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p class="text-success">-{{ price_info.discount_amount }} ₽</p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success mb-0">
+                                <i class="bi bi-check-circle"></i> {{ price_info.discount_description }}
+                            </div>
+                        {% endif %}
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Итого к оплате:</h4>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h3 class="text-primary mb-0">{{ price_info.final_price }} ₽</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Purchase Form -->
+                    <form method="post" action="{% url 'memberships_web:purchase' membership_type.id %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Дата начала действия абонемента</label>
+                            <input type="date"
+                                   class="form-control"
+                                   id="start_date"
+                                   name="start_date"
+                                   value="{{ today|date:'Y-m-d' }}"
+                                   min="{{ today|date:'Y-m-d' }}">
+                            <small class="form-text text-muted">По умолчанию - сегодня</small>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agree" required>
+                            <label class="form-check-label" for="agree">
+                                Я согласен с <a href="#" target="_blank">условиями использования</a> и <a href="#" target="_blank">правилами клуба</a>
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Подтвердить покупку
+                            </button>
+                            <a href="{% url 'memberships_web:catalog' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Назад к каталогу
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="alert alert-info mt-4">
+                <h5><i class="bi bi-info-circle"></i> Информация</h5>
+                <ul class="mb-0">
+                    <li>Абонемент активируется сразу после подтверждения покупки</li>
+                    <li>Вы сможете начать бронировать занятия сразу после активации</li>
+                    <li>Онлайн-оплата будет доступна в следующей версии (Sprint 5)</li>
+                    <li>Сейчас оплата производится в клубе при получении абонемента</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
