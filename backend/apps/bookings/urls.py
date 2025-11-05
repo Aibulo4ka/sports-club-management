@@ -1,7 +1,4 @@
 from django.urls import path
 
-app_name = 'bookings'
+urlpatterns = []
 
-urlpatterns = [
-    # TODO: Add booking endpoints in Sprint 4
-]
