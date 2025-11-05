@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        <i class="bi bi-calendar3"></i> {{ page_title }}
+    </h1>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <!-- Date Filter -->
+                <div class="col-md-6">
+                    <label class="form-label">Период</label>
+                    <select name="date" class="form-select" onchange="this.form.submit()">
+                        <option value="upcoming" {% if selected_filter == 'upcoming' %}selected{% endif %}>Предстоящие</option>
+                        <option value="today" {% if selected_filter == 'today' %}selected{% endif %}>Сегодня</option>
+                        <option value="tomorrow" {% if selected_filter == 'tomorrow' %}selected{% endif %}>Завтра</option>
+                        <option value="week" {% if selected_filter == 'week' %}selected{% endif %}>Неделя</option>
+                    </select>
+                </div>
+
+                <!-- Class Type Filter -->
+                <div class="col-md-6">
+                    <label class="form-label">Тип занятия</label>
+                    <select name="type" class="form-select" onchange="this.form.submit()">
+                        <option value="">Все типы</option>
+                        {% for type in class_types %}
+                        <option value="{{ type.id }}" {% if selected_type == type.id|stringformat:"s" %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Classes List -->
+    {% if classes_by_date %}
+        {% for date, classes in classes_by_date.items %}
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-date"></i>
+                    {{ date|date:"d E Y (l)" }}
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for class in classes %}
+                    <a href="{% url 'classes_web:detail' class.id %}"
+                       class="list-group-item list-group-item-action">
+                        <div class="row align-items-center">
+                            <!-- Time -->
+                            <div class="col-md-2">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-clock"></i>
+                                    {{ class.datetime|date:"H:i" }}
+                                </h5>
+                                <small class="text-muted">{{ class.duration_minutes }} мин</small>
+                            </div>
+
+                            <!-- Class Info -->
+                            <div class="col-md-4">
+                                <h6 class="mb-1">{{ class.class_type.name }}</h6>
+                                <p class="mb-0 text-muted">
+                                    <i class="bi bi-person"></i>
+                                    {{ class.trainer.profile.user.get_full_name }}
+                                </p>
+                            </div>
+
+                            <!-- Room -->
+                            <div class="col-md-3">
+                                <p class="mb-0">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ class.room.name }}
+                                </p>
+                                <small class="text-muted">Этаж {{ class.room.floor }}</small>
+                            </div>
+
+                            <!-- Capacity -->
+                            <div class="col-md-3 text-end">
+                                {% if class.available_spots > 0 %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-people"></i>
+                                        Свободно: {{ class.available_spots }}/{{ class.max_capacity }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-people-fill"></i>
+                                        Мест нет
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            Нет занятий в выбранном периоде.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

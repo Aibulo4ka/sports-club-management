@@ -24,6 +24,7 @@ urlpatterns = [
     # Web pages (Django templates)
     path('', include('apps.accounts.urls_web')),  # Home, login, register
     path('memberships/', include('apps.memberships.urls_web')),  # Memberships catalog, purchase
+    path('classes/', include('apps.classes.urls_web')),  # Classes schedule
 ]
 
 # Serve media files in development
