@@ -1,7 +1,15 @@
-from django.urls import path
+"""
+URL configuration for facilities app API
+"""
 
-app_name = 'facilities'
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import RoomViewSet
+
+# Create router and register viewsets
+router = DefaultRouter()
+router.register(r'rooms', RoomViewSet, basename='room')
 
 urlpatterns = [
-    # TODO: Add facility endpoints in Sprint 3
+    path('', include(router.urls)),
 ]
