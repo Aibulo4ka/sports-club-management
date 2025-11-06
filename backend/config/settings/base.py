@@ -195,6 +195,11 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 YOOKASSA_SHOP_ID = config('YOOKASSA_SHOP_ID', default='')
 YOOKASSA_SECRET_KEY = config('YOOKASSA_SECRET_KEY', default='')
 
+# SMS Configuration (SMSC.ru)
+SMS_ENABLED = config('SMS_ENABLED', default=False, cast=bool)
+SMSC_LOGIN = config('SMSC_LOGIN', default='')
+SMSC_PASSWORD = config('SMSC_PASSWORD', default='')
+
 # Logging
 LOGGING = {
     'version': 1,

@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('apps.accounts.urls_web')),  # Home, login, register
     path('memberships/', include('apps.memberships.urls_web')),  # Memberships catalog, purchase
     path('classes/', include('apps.classes.urls_web')),  # Classes schedule
+    path('bookings/', include('apps.bookings.urls_web')),  # My bookings, create, cancel
 ]
 
 # Serve media files in development
