@@ -57,7 +57,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'accounts_web:profile' %}">Профиль</a></li>
                                 <li><a class="dropdown-item" href="{% url 'memberships_web:my_memberships' %}">Мои абонементы</a></li>
-                                <li><a class="dropdown-item" href="#">Мои бронирования</a></li>
+                                <li><a class="dropdown-item" href="{% url 'bookings_web:my_bookings' %}">Мои бронирования</a></li>
                                 {% if user.is_staff %}
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/admin/">Админ-панель</a></li>
