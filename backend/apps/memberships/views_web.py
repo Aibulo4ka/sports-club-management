@@ -24,7 +24,7 @@ def catalog_view(request):
     # If user is authenticated and is a client, calculate prices with discounts
     if request.user.is_authenticated:
         try:
-            client = request.user.profile.client
+            client = request.user.profile.client_info
 
             # Add calculated price with discount to each membership type
             for membership_type in membership_types:
@@ -58,7 +58,7 @@ def my_memberships_view(request):
     Display user's memberships (active and inactive)
     """
     try:
-        client = request.user.profile.client
+        client = request.user.profile.client_info
     except (AttributeError, Client.DoesNotExist):
         messages.error(request, 'Вы не являетесь клиентом клуба')
         return redirect('accounts_web:home')
@@ -99,7 +99,7 @@ def purchase_view(request, membership_type_id):
     membership_type = get_object_or_404(MembershipType, id=membership_type_id, is_active=True)
 
     try:
-        client = request.user.profile.client
+        client = request.user.profile.client_info
     except (AttributeError, Client.DoesNotExist):
         messages.error(request, 'Вы не являетесь клиентом клуба')
         return redirect('memberships_web:catalog')

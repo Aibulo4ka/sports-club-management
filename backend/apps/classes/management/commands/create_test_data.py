@@ -166,19 +166,34 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.WARNING(f'  ⚠ Пропущено: {e}'))
 
-        # 5. Create some clients with memberships
+        # 5. Create membership types
+        self.stdout.write('\nСоздание типов абонементов...')
+        membership_types_data = [
+            {'name': 'Разовое посещение', 'description': 'Одно посещение клуба', 'price': Decimal('500.00'), 'duration_days': 1, 'visits_limit': 1},
+            {'name': '8 занятий', 'description': 'Абонемент на 8 посещений (30 дней)', 'price': Decimal('2400.00'), 'duration_days': 30, 'visits_limit': 8},
+            {'name': '12 занятий', 'description': 'Абонемент на 12 посещений (30 дней)', 'price': Decimal('3200.00'), 'duration_days': 30, 'visits_limit': 12},
+            {'name': 'Месячный безлимит', 'description': 'Безлимитный доступ на 30 дней', 'price': Decimal('4000.00'), 'duration_days': 30, 'visits_limit': None},
+            {'name': '3 месяца безлимит', 'description': 'Безлимитный доступ на 90 дней', 'price': Decimal('10500.00'), 'duration_days': 90, 'visits_limit': None},
+            {'name': 'Годовой безлимит', 'description': 'Безлимитный доступ на год', 'price': Decimal('36000.00'), 'duration_days': 365, 'visits_limit': None},
+        ]
+
+        for data in membership_types_data:
+            membership_type, created = MembershipType.objects.get_or_create(
+                name=data['name'],
+                defaults={
+                    'description': data['description'],
+                    'price': data['price'],
+                    'duration_days': data['duration_days'],
+                    'visits_limit': data['visits_limit']
+                }
+            )
+            if created:
+                self.stdout.write(f'  ✓ Создан: {membership_type.name} - {membership_type.price} руб.')
+
+        # 6. Create some clients with memberships
         self.stdout.write('\nСоздание клиентов и абонементов...')
 
-        # Create membership type
-        membership_type, _ = MembershipType.objects.get_or_create(
-            name='Месячный безлимит',
-            defaults={
-                'description': 'Безлимитный доступ на 30 дней',
-                'price': Decimal('3000.00'),
-                'duration_days': 30,
-                'visits_limit': None
-            }
-        )
+        monthly_unlimited = MembershipType.objects.get(name='Месячный безлимит')
 
         clients_data = [
             {'username': 'client_maria', 'first_name': 'Мария', 'last_name': 'Сидорова', 'phone': '+79161234570', 'is_student': True},

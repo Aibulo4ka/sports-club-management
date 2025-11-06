@@ -81,16 +81,21 @@ def class_detail_view(request, class_id):
         id=class_id
     )
 
-    # Check if user is authenticated and already booked
+    # Проверяем, записан ли текущий пользователь на это занятие
     is_booked = False
     if request.user.is_authenticated:
-        # TODO: Check if user has a booking for this class
-        # from apps.bookings.models import Booking
-        # is_booked = Booking.objects.filter(
-        #     user=request.user,
-        #     class_instance=class_obj
-        # ).exists()
-        pass
+        from apps.bookings.models import Booking, BookingStatus
+        from apps.accounts.models import Client
+
+        try:
+            client = request.user.profile.client
+            is_booked = Booking.objects.filter(
+                client=client,
+                class_instance=class_obj,
+                status=BookingStatus.CONFIRMED
+            ).exists()
+        except (AttributeError, Client.DoesNotExist):
+            pass
 
     context = {
         'class': class_obj,
