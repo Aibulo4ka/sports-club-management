@@ -18,4 +18,5 @@ urlpatterns = [
 
     # Profile pages
     path('profile/', views_web.profile_view, name='profile'),
+    path('profile/edit/', views_web.edit_profile_view, name='edit_profile'),
 ]

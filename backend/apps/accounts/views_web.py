@@ -128,3 +128,65 @@ def profile_view(request):
         'user': request.user,
         'profile': request.user.profile
     })
+
+
+@login_required
+def edit_profile_view(request):
+    """
+    Редактирование профиля пользователя
+    """
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        # Получаем данные из формы
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        date_of_birth = request.POST.get('date_of_birth', '')
+        address = request.POST.get('address', '')
+
+        # Валидация email на уникальность (если изменился)
+        from django.contrib.auth.models import User
+        if email != request.user.email:
+            if User.objects.filter(email=email).exclude(id=request.user.id).exists():
+                messages.error(request, 'Пользователь с таким email уже существует')
+                return render(request, 'accounts/edit_profile.html', {
+                    'user': request.user,
+                    'profile': profile
+                })
+
+        try:
+            from django.db import transaction
+
+            with transaction.atomic():
+                # Обновляем данные пользователя
+                request.user.first_name = first_name
+                request.user.last_name = last_name
+                request.user.email = email
+                request.user.save()
+
+                # Обновляем профиль
+                profile.phone = phone
+                profile.address = address
+
+                # Обновляем дату рождения (если указана)
+                if date_of_birth:
+                    from datetime import datetime
+                    try:
+                        profile.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+                    except ValueError:
+                        pass  # Игнорируем неправильный формат
+
+                profile.save()
+
+            messages.success(request, 'Профиль успешно обновлён!')
+            return redirect('accounts_web:profile')
+
+        except Exception as e:
+            messages.error(request, f'Ошибка при обновлении профиля: {str(e)}')
+
+    return render(request, 'accounts/edit_profile.html', {
+        'user': request.user,
+        'profile': profile
+    })
