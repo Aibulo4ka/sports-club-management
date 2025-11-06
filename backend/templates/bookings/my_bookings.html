@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои бронирования - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        <i class="bi bi-calendar-check"></i> Мои бронирования
+    </h1>
+
+    <!-- Предстоящие бронирования -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history"></i> Предстоящие занятия
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if upcoming_bookings %}
+                <div class="list-group">
+                    {% for booking in upcoming_bookings %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <!-- Дата и время -->
+                            <div class="col-md-2">
+                                <h6 class="mb-0">
+                                    {{ booking.class_instance.datetime|date:"d.m.Y" }}
+                                </h6>
+                                <h5 class="mb-0 text-primary">
+                                    <i class="bi bi-clock"></i>
+                                    {{ booking.class_instance.datetime|date:"H:i" }}
+                                </h5>
+                            </div>
+
+                            <!-- Информация о занятии -->
+                            <div class="col-md-5">
+                                <h6 class="mb-1">{{ booking.class_instance.class_type.name }}</h6>
+                                <p class="mb-0 text-muted">
+                                    <i class="bi bi-person"></i>
+                                    {{ booking.class_instance.trainer.profile.user.get_full_name }}
+                                </p>
+                                <p class="mb-0 text-muted">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ booking.class_instance.room.name }}
+                                </p>
+                            </div>
+
+                            <!-- Длительность -->
+                            <div class="col-md-2">
+                                <span class="badge bg-info">
+                                    {{ booking.class_instance.duration_minutes }} мин
+                                </span>
+                            </div>
+
+                            <!-- Действия -->
+                            <div class="col-md-3 text-end">
+                                {% if booking.can_cancel %}
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#cancelModal{{ booking.id }}">
+                                        <i class="bi bi-x-circle"></i> Отменить
+                                    </button>
+                                {% else %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle"></i>
+                                        Отмена недоступна<br>(менее 24 часов)
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if booking.notes %}
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <small class="text-muted">
+                                    <strong>Заметки:</strong> {{ booking.notes }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Модальное окно подтверждения отмены -->
+                    <div class="modal fade" id="cancelModal{{ booking.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Подтверждение отмены</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Вы уверены, что хотите отменить бронирование на занятие:</p>
+                                    <p class="fw-bold">
+                                        {{ booking.class_instance.class_type.name }}<br>
+                                        {{ booking.class_instance.datetime|date:"d.m.Y в H:i" }}
+                                    </p>
+                                    <p class="text-muted small">
+                                        <i class="bi bi-info-circle"></i>
+                                        Посещение будет возвращено в ваш абонемент.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Отмена
+                                    </button>
+                                    <form method="post" action="{% url 'bookings_web:cancel' booking.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">
+                                            Да, отменить бронирование
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    У вас нет предстоящих бронирований.
+                    <a href="{% url 'classes_web:schedule' %}" class="alert-link">
+                        Перейти к расписанию занятий
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Прошедшие бронирования -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-check-circle"></i> Прошедшие занятия
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if past_bookings %}
+                <div class="list-group">
+                    {% for booking in past_bookings %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <small class="text-muted">
+                                    {{ booking.class_instance.datetime|date:"d.m.Y H:i" }}
+                                </small>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>{{ booking.class_instance.class_type.name }}</strong>
+                            </div>
+                            <div class="col-md-3">
+                                {{ booking.class_instance.trainer.profile.user.get_full_name }}
+                            </div>
+                            <div class="col-md-3 text-end">
+                                {% if booking.status == 'COMPLETED' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Посещено
+                                    </span>
+                                {% elif booking.status == 'NO_SHOW' %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-x-circle"></i> Не пришёл
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ booking.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">Нет прошедших бронирований</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Отменённые бронирования -->
+    {% if cancelled_bookings %}
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-x-circle"></i> Отменённые
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for booking in cancelled_bookings %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <small class="text-muted">
+                                Занятие: {{ booking.class_instance.datetime|date:"d.m.Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>{{ booking.class_instance.class_type.name }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">
+                                Отменено: {{ booking.cancelled_at|date:"d.m.Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <span class="badge bg-danger">Отменено</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
