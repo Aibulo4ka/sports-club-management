@@ -48,25 +48,9 @@
                             <td>{{ profile.created_at|date:"d.m.Y" }}</td>
                         </tr>
                     </table>
-                    <a href="#" class="btn btn-primary">Редактировать профиль</a>
-                </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5>Мои абонементы</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">Абонементы будут отображаться здесь (Sprint 2)</p>
-                </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5>Мои бронирования</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">Бронирования будут отображаться здесь (Sprint 4)</p>
+                    <a href="{% url 'accounts_web:edit_profile' %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Редактировать профиль
+                    </a>
                 </div>
             </div>
         </div>
