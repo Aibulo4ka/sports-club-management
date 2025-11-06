@@ -3,6 +3,8 @@ Models for bookings app: Booking, Visit
 """
 
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 from apps.accounts.models import Client
 from apps.classes.models import Class
 
@@ -38,6 +40,17 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.client} - {self.class_instance} ({self.status})"
+
+    @property
+    def can_cancel(self):
+        """
+        Проверяет, можно ли отменить бронирование
+        Правила: статус CONFIRMED и до занятия >= 24 часов
+        """
+        if self.status != BookingStatus.CONFIRMED:
+            return False
+        time_until_class = self.class_instance.datetime - timezone.now()
+        return time_until_class > timedelta(hours=24)
 
 
 class Visit(models.Model):
