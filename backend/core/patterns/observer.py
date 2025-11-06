@@ -172,13 +172,43 @@ class EmailNotifier(Observer):
 
 class SMSNotifier(Observer):
     """
-    Send SMS notifications (optional - requires SMS service integration)
+    Отправка SMS уведомлений через SMSC.ru
     """
 
     def update(self, event: str, data: Dict[str, Any]) -> None:
-        """Send SMS based on event"""
-        # TODO: Implement SMS notifications using SMSC.ru or Twilio
-        pass
+        """Отправить SMS в зависимости от события"""
+        from core.services.sms_service import (
+            send_booking_confirmation_sms,
+            send_booking_reminder_sms,
+            send_membership_expiring_sms
+        )
+
+        phone = data.get('phone')
+        if not phone:
+            return
+
+        try:
+            if event == 'booking_created':
+                send_booking_confirmation_sms(
+                    phone=phone,
+                    class_name=data.get('class_name'),
+                    class_datetime=data.get('class_datetime')
+                )
+            elif event == 'booking_reminder':
+                send_booking_reminder_sms(
+                    phone=phone,
+                    class_name=data.get('class_name'),
+                    class_datetime=data.get('class_datetime')
+                )
+            elif event == 'membership_expiring':
+                send_membership_expiring_sms(
+                    phone=phone,
+                    days_remaining=data.get('days_remaining')
+                )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Ошибка отправки SMS: {e}")
 
 
 class AnalyticsLogger(Observer):
@@ -217,27 +247,30 @@ class PaymentSubject(Subject):
 
 class BookingSubject(Subject):
     """
-    Subject for booking events
+    Subject для событий бронирования
     """
 
     def __init__(self):
         super().__init__()
-        # Attach default observers
+        # Подключаем наблюдателей по умолчанию
         self.attach(EmailNotifier())
+        # self.attach(SMSNotifier())  # SMS опционально (требует платного API)
         self.attach(AnalyticsLogger())
 
-    def booking_created(self, user_email: str, class_name: str, class_datetime: str) -> None:
-        """Notify about created booking"""
+    def booking_created(self, user_email: str, class_name: str, class_datetime: str, phone: str = None) -> None:
+        """Уведомление о создании бронирования"""
         self.notify('booking_created', {
             'user_email': user_email,
+            'phone': phone,  # Опционально для SMS
             'class_name': class_name,
             'class_datetime': class_datetime
         })
 
-    def booking_reminder(self, user_email: str, class_name: str, class_datetime: str) -> None:
-        """Send booking reminder"""
+    def booking_reminder(self, user_email: str, class_name: str, class_datetime: str, phone: str = None) -> None:
+        """Отправка напоминания о занятии"""
         self.notify('booking_reminder', {
             'user_email': user_email,
+            'phone': phone,  # Опционально для SMS
             'class_name': class_name,
             'class_datetime': class_datetime
         })
