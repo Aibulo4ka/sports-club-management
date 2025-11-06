@@ -35,7 +35,7 @@ class Profile(models.Model):
     phone = models.CharField(
         validators=[phone_regex],
         max_length=17,
-        unique=True,
+        blank=True,
         verbose_name='Телефон'
     )
     date_of_birth = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
