@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Ошибка оплаты - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Failed Card -->
+            <div class="card border-danger shadow-lg">
+                <div class="card-header bg-danger text-white text-center py-4">
+                    <h2 class="mb-0">
+                        <i class="bi bi-x-circle-fill" style="font-size: 3rem;"></i>
+                    </h2>
+                    <h3 class="mt-3">Оплата не прошла</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        К сожалению, произошла ошибка при обработке платежа. Пожалуйста, попробуйте снова.
+                    </div>
+
+                    <h5 class="mb-3">Детали платежа:</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Номер платежа:</dt>
+                        <dd class="col-sm-8">#{{ payment.id }}</dd>
+
+                        <dt class="col-sm-4">Сумма:</dt>
+                        <dd class="col-sm-8">{{ payment.amount }} руб.</dd>
+
+                        <dt class="col-sm-4">Дата попытки:</dt>
+                        <dd class="col-sm-8">{{ payment.created_at|date:"d.m.Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Статус:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-danger">{{ payment.get_status_display }}</span>
+                        </dd>
+                    </dl>
+
+                    {% if membership %}
+                    <hr>
+                    <h5 class="mb-3">Абонемент (не активирован):</h5>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ membership.membership_type.name }}</h6>
+                            <p class="card-text text-muted">
+                                Стоимость: <strong>{{ payment.amount }} руб.</strong>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <hr>
+                    <h5 class="mb-3">Что делать дальше?</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="bi bi-1-circle text-primary"></i>
+                            Проверьте правильность введённых платёжных данных
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-2-circle text-primary"></i>
+                            Убедитесь, что на карте достаточно средств
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-3-circle text-primary"></i>
+                            Попробуйте использовать другую карту или способ оплаты
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-4-circle text-primary"></i>
+                            Обратитесь в службу поддержки вашего банка
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="row">
+                        {% if membership %}
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'memberships_web:purchase' membership.membership_type.id %}"
+                               class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-repeat"></i> Попробовать снова
+                            </a>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'memberships_web:catalog' %}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-left"></i> Вернуться к каталогу
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support info -->
+            <div class="alert alert-info mt-4">
+                <h6><i class="bi bi-question-circle"></i> Нужна помощь?</h6>
+                <p class="mb-0">
+                    Если проблема повторяется, свяжитесь с нашей службой поддержки:
+                    <br>
+                    <i class="bi bi-telephone"></i> +7 (xxx) xxx-xx-xx
+                    <br>
+                    <i class="bi bi-envelope"></i> support@sports-club.ru
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

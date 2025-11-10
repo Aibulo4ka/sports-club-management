@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Оплата успешна - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Success Card -->
+            <div class="card border-success shadow-lg">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h2 class="mb-0">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                    </h2>
+                    <h3 class="mt-3">Оплата прошла успешно!</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-success">
+                        <i class="bi bi-info-circle"></i>
+                        Спасибо за оплату! Ваш абонемент активирован и готов к использованию.
+                    </div>
+
+                    <h5 class="mb-3">Детали платежа:</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Номер платежа:</dt>
+                        <dd class="col-sm-8"><strong>#{{ payment.id }}</strong></dd>
+
+                        <dt class="col-sm-4">Сумма:</dt>
+                        <dd class="col-sm-8"><strong>{{ payment.amount }} руб.</strong></dd>
+
+                        <dt class="col-sm-4">Дата оплаты:</dt>
+                        <dd class="col-sm-8">{{ payment.completed_at|date:"d.m.Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Способ оплаты:</dt>
+                        <dd class="col-sm-8">{{ payment.get_payment_method_display }}</dd>
+
+                        {% if payment.transaction_id %}
+                        <dt class="col-sm-4">ID транзакции:</dt>
+                        <dd class="col-sm-8"><code>{{ payment.transaction_id }}</code></dd>
+                        {% endif %}
+                    </dl>
+
+                    {% if membership %}
+                    <hr>
+                    <h5 class="mb-3">Ваш абонемент:</h5>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ membership.membership_type.name }}</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Период действия:</dt>
+                                <dd class="col-sm-8">
+                                    {{ membership.start_date|date:"d.m.Y" }} -
+                                    {{ membership.end_date|date:"d.m.Y" }}
+                                </dd>
+
+                                {% if membership.visits_remaining is not None %}
+                                <dt class="col-sm-4">Посещений:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-primary">{{ membership.visits_remaining }}</span>
+                                </dd>
+                                {% else %}
+                                <dt class="col-sm-4">Посещения:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">Безлимит</span>
+                                </dd>
+                                {% endif %}
+
+                                <dt class="col-sm-4">Статус:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-success">Активен</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'classes_web:schedule' %}" class="btn btn-primary w-100">
+                                <i class="bi bi-calendar-check"></i> Записаться на занятия
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'memberships_web:my_memberships' %}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-card-list"></i> Мои абонементы
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional info -->
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <i class="bi bi-envelope"></i> Квитанция об оплате отправлена на ваш email
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

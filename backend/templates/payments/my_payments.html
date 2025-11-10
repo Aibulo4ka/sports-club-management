@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои платежи - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5"><i class="bi bi-credit-card"></i> История платежей</h1>
+            <p class="text-muted">Все ваши транзакции и оплаты</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Фильтр по статусу -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-group" role="group">
+                <a href="{% url 'payments_web:my_payments' %}"
+                   class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">
+                    Все
+                </a>
+                <a href="?status=PENDING"
+                   class="btn btn-outline-warning {% if status_filter == 'PENDING' %}active{% endif %}">
+                    Ожидают оплаты
+                </a>
+                <a href="?status=COMPLETED"
+                   class="btn btn-outline-success {% if status_filter == 'COMPLETED' %}active{% endif %}">
+                    Оплачены
+                </a>
+                <a href="?status=FAILED"
+                   class="btn btn-outline-danger {% if status_filter == 'FAILED' %}active{% endif %}">
+                    Неудачные
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ожидающие платежи -->
+    {% if pending_payments %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3"><i class="bi bi-clock-history"></i> Ожидают оплаты</h3>
+            {% for payment in pending_payments %}
+            <div class="card border-warning mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <strong>Платёж #{{ payment.id }}</strong> - {{ payment.amount }} руб.
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Абонемент:</dt>
+                                <dd class="col-sm-8">
+                                    {% if payment.membership %}
+                                        {{ payment.membership.membership_type.name }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4">Сумма:</dt>
+                                <dd class="col-sm-8"><strong>{{ payment.amount }} руб.</strong></dd>
+
+                                <dt class="col-sm-4">Создан:</dt>
+                                <dd class="col-sm-8">{{ payment.created_at|date:"d.m.Y H:i" }}</dd>
+
+                                <dt class="col-sm-4">Способ оплаты:</dt>
+                                <dd class="col-sm-8">{{ payment.get_payment_method_display }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            {% if payment.payment_url %}
+                                <a href="{{ payment.payment_url }}" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-credit-card"></i> Оплатить
+                                </a>
+                            {% else %}
+                                <p class="text-muted"><small>Ожидание формирования платежа...</small></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Завершённые платежи -->
+    {% if completed_payments %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3"><i class="bi bi-check-circle"></i> Завершённые платежи</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Дата</th>
+                            <th>Абонемент</th>
+                            <th>Сумма</th>
+                            <th>Способ</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in completed_payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.completed_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                {% if payment.membership %}
+                                    {{ payment.membership.membership_type.name }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ payment.amount }} руб.</strong></td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>
+                                <span class="badge bg-success">{{ payment.get_status_display }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Неудачные платежи -->
+    {% if failed_payments %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3"><i class="bi bi-x-circle"></i> Неудачные платежи</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Дата</th>
+                            <th>Абонемент</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in failed_payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.created_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                {% if payment.membership %}
+                                    {{ payment.membership.membership_type.name }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ payment.amount }} руб.</td>
+                            <td>
+                                <span class="badge bg-danger">{{ payment.get_status_display }}</span>
+                            </td>
+                            <td>
+                                {% if payment.membership %}
+                                    <a href="{% url 'memberships_web:purchase' payment.membership.membership_type.id %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Попробовать снова
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Нет платежей -->
+    {% if not pending_payments and not completed_payments and not failed_payments %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> У вас пока нет платежей.
+            <a href="{% url 'memberships_web:catalog' %}" class="alert-link">Купить абонемент</a>
+        </div>
+    {% endif %}
+
+    <!-- Быстрые действия -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Хотите приобрести абонемент?</h5>
+                    <p class="card-text">Выберите подходящий тариф и начните тренировки!</p>
+                    <a href="{% url 'memberships_web:catalog' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-right-circle"></i> Перейти к каталогу
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

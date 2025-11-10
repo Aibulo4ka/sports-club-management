@@ -105,44 +105,40 @@ def purchase_view(request, membership_type_id):
         return redirect('memberships_web:catalog')
 
     if request.method == 'POST':
-        # Get start date from form (default to today)
-        start_date_str = request.POST.get('start_date')
-
+        # Создаём платёж через Payment API
         try:
-            if start_date_str:
-                from datetime import datetime
-                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            else:
-                start_date = timezone.now().date()
+            from apps.payments.models import Payment, PaymentMethod
+            from apps.payments.serializers import PaymentCreateSerializer
 
-            # Validate start date is not in the past
-            if start_date < timezone.now().date():
-                messages.error(request, 'Дата начала не может быть в прошлом')
+            # Подготавливаем данные для создания платежа
+            payment_data = {
+                'membership_type_id': membership_type.id,
+                'payment_method': PaymentMethod.YOOKASSA
+            }
+
+            # Создаём платёж через сериализатор
+            serializer = PaymentCreateSerializer(
+                data=payment_data,
+                context={'client': client, 'request': request}
+            )
+
+            if serializer.is_valid():
+                payment = serializer.save()
+
+                # TODO: После интеграции с YooKassa здесь будет редирект на payment_url
+                # Пока просто перенаправляем на страницу истории платежей
+                messages.info(
+                    request,
+                    f'Платёж создан! Сумма к оплате: {payment.amount} руб. '
+                    f'После оплаты ваш абонемент будет активирован автоматически.'
+                )
+                return redirect('payments_web:my_payments')
+            else:
+                messages.error(request, f'Ошибка при создании платежа: {serializer.errors}')
                 return redirect('memberships_web:purchase', membership_type_id=membership_type_id)
 
-            # Calculate end date
-            end_date = start_date + timedelta(days=membership_type.duration_days)
-
-            # Create membership
-            membership = Membership.objects.create(
-                client=client,
-                membership_type=membership_type,
-                start_date=start_date,
-                end_date=end_date,
-                status=MembershipStatus.ACTIVE,
-                visits_remaining=membership_type.visits_limit
-            )
-
-            messages.success(
-                request,
-                f'Поздравляем! Вы успешно приобрели абонемент "{membership_type.name}". '
-                f'Он действителен с {start_date.strftime("%d.m.%Y")} по {end_date.strftime("%d.%m.%Y")}.'
-            )
-
-            return redirect('memberships_web:my_memberships')
-
         except Exception as e:
-            messages.error(request, f'Ошибка при покупке абонемента: {str(e)}')
+            messages.error(request, f'Ошибка при создании платежа: {str(e)}')
             return redirect('memberships_web:purchase', membership_type_id=membership_type_id)
 
     # GET request - display purchase page
