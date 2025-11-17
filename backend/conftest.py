@@ -100,6 +100,10 @@ def test_student_user():
         profile=profile,
         defaults={'is_student': True}
     )
+    # Явно обновляем is_student=True даже если клиент уже существовал
+    if not client.is_student:
+        client.is_student = True
+        client.save()
     return user
 
 

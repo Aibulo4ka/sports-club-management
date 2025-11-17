@@ -45,7 +45,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         # Если пользователь - клиент, показываем только его бронирования
         if hasattr(user, 'profile') and user.profile.role == 'CLIENT':
             try:
-                client = user.profile.client
+                client = user.profile.client_info
                 return self.queryset.filter(client=client)
             except Client.DoesNotExist:
                 return self.queryset.none()
@@ -66,7 +66,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            client = request.user.profile.client
+            client = request.user.profile.client_info
         except Client.DoesNotExist:
             return Response(
                 {'error': 'Клиент не найден'},
@@ -109,7 +109,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            client = request.user.profile.client
+            client = request.user.profile.client_info
         except Client.DoesNotExist:
             return Response(
                 {'error': 'Клиент не найден'},
@@ -164,7 +164,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         # Проверяем, что бронирование принадлежит текущему клиенту
         if hasattr(request.user, 'profile'):
             try:
-                client = request.user.profile.client
+                client = request.user.profile.client_info_info
                 if booking.client != client and request.user.profile.role != 'ADMIN':
                     return Response(
                         {'error': 'Вы не можете отменить чужое бронирование'},

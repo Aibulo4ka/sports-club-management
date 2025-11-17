@@ -10,7 +10,12 @@ from .views import PaymentViewSet
 router = DefaultRouter()
 router.register(r'', PaymentViewSet, basename='payment')
 
+app_name = 'payments'
+
 urlpatterns = [
+    # Explicit webhook endpoint (for easier access)
+    path('webhook/', PaymentViewSet.as_view({'post': 'webhook'}), name='yookassa-webhook'),
+
     # API endpoints (уже вложены в /api/payments/ из главного urls.py)
     path('', include(router.urls)),
 ]

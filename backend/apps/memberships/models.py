@@ -70,4 +70,4 @@ class Membership(models.Model):
         ordering = ['-purchased_at']
 
     def __str__(self):
-        return f"{self.client} - {self.membership_type.name} ({self.status})"
+        return f"{self.client} - {self.membership_type.name} ({self.get_status_display()})"

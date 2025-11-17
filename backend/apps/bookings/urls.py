@@ -11,6 +11,8 @@ router = DefaultRouter()
 router.register(r'', BookingViewSet, basename='booking')
 router.register(r'visits', VisitViewSet, basename='visit')
 
+app_name = 'bookings'
+
 urlpatterns = [
     # API endpoints (уже вложены в /api/bookings/ из главного urls.py)
     path('', include(router.urls)),

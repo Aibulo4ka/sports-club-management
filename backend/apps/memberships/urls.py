@@ -8,12 +8,14 @@ from .views import MembershipTypeViewSet, MembershipViewSet, PriceCalculationVie
 
 # Create router for ViewSets
 router = DefaultRouter()
-router.register(r'types', MembershipTypeViewSet, basename='membership-type')
+router.register(r'types', MembershipTypeViewSet, basename='membershiptype')
 router.register(r'', MembershipViewSet, basename='membership')
+
+app_name = 'memberships'
 
 urlpatterns = [
     # Price calculation endpoint
-    path('calculate-price/', PriceCalculationViewSet.as_view({'post': 'calculate'}), name='membership-calculate-price'),
+    path('calculate-price/', PriceCalculationViewSet.as_view({'post': 'calculate'}), name='calculate-price'),
 
     # Router URLs (must be last)
     path('', include(router.urls)),

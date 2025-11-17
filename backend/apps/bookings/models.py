@@ -39,7 +39,7 @@ class Booking(models.Model):
         unique_together = ('client', 'class_instance')
 
     def __str__(self):
-        return f"{self.client} - {self.class_instance} ({self.status})"
+        return f"{self.client} - {self.class_instance} ({self.get_status_display()})"
 
     @property
     def can_cancel(self):

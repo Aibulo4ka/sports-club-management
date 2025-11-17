@@ -69,4 +69,4 @@ class Payment(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Payment #{self.id} - {self.amount} руб. ({self.status})"
+        return f"Payment #{self.id} - {self.amount} руб. ({self.get_status_display()})"

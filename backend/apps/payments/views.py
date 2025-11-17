@@ -57,7 +57,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         # Если пользователь - клиент, показываем только его платежи
         if hasattr(user, 'profile') and user.profile.role == 'CLIENT':
             try:
-                client = user.profile.client
+                client = user.profile.client_info
                 return self.queryset.filter(client=client)
             except Client.DoesNotExist:
                 return self.queryset.none()
@@ -81,7 +81,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            client = request.user.profile.client
+            client = request.user.profile.client_info
         except Client.DoesNotExist:
             return Response(
                 {'error': 'Клиент не найден'},
@@ -123,7 +123,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            client = request.user.profile.client
+            client = request.user.profile.client_info
         except Client.DoesNotExist:
             return Response(
                 {'error': 'Клиент не найден'},
@@ -162,7 +162,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         # Проверяем доступ
         if hasattr(request.user, 'profile'):
             try:
-                client = request.user.profile.client
+                client = request.user.profile.client_info_info
                 if payment.client != client and request.user.profile.role != 'ADMIN':
                     return Response(
                         {'error': 'Доступ запрещён'},
