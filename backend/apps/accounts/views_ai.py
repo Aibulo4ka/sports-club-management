@@ -63,8 +63,8 @@ def generate_workout(request):
         # Получаем данные клиента
         age = (timezone.now().date() - client.profile.date_of_birth).days // 365 if client.profile.date_of_birth else 25
 
-        # Получаем активный абонемент
-        active_membership = client.client_memberships.filter(status='ACTIVE').first()
+        # Получаем активный абонемент (правильный related_name - 'memberships')
+        active_membership = client.memberships.filter(status='ACTIVE').first()
         membership_type = active_membership.membership_type.name if active_membership else 'Базовый'
 
         client_data = {

@@ -107,7 +107,7 @@
 
     <!-- Current Active Plans -->
     {% if latest_workout or latest_nutrition %}
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-5 align-items-stretch">
         <div class="col-12">
             <h2 style="color: var(--text-light); font-weight: 700;">
                 <i class="bi bi-star-fill"></i> Актуальные планы
@@ -115,35 +115,57 @@
         </div>
 
         {% if latest_workout %}
-        <div class="col-md-6">
-            <div class="card" style="border: 1px solid rgba(255, 107, 53, 0.3);">
-                <div class="card-body">
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="border: 1px solid rgba(255, 107, 53, 0.3);">
+                <div class="card-body d-flex flex-column">
                     <h5 style="color: var(--primary-color);"><i class="bi bi-lightning-charge"></i> Программа тренировок</h5>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; flex-grow: 1;">
                         Создана: {{ latest_workout.created_at|date:"d.m.Y в H:i" }}<br>
                         Цель: {{ latest_workout.get_goal_display }}<br>
                         Уровень: {{ latest_workout.get_fitness_level_display }}
                     </p>
-                    <a href="{% url 'accounts_web:view_workout_plan' latest_workout.id %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'accounts_web:view_workout_plan' latest_workout.id %}" class="btn btn-primary btn-sm mt-auto">
                         <i class="bi bi-eye"></i> Посмотреть программу
                     </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="border: 1px solid rgba(255, 107, 53, 0.2); opacity: 0.6;">
+                <div class="card-body d-flex flex-column">
+                    <h5 style="color: var(--primary-color);"><i class="bi bi-lightning-charge"></i> Программа тренировок</h5>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; flex-grow: 1;">
+                        У вас пока нет активной программы тренировок
+                    </p>
                 </div>
             </div>
         </div>
         {% endif %}
 
         {% if latest_nutrition %}
-        <div class="col-md-6">
-            <div class="card" style="border: 1px solid rgba(0, 217, 165, 0.3);">
-                <div class="card-body">
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="border: 1px solid rgba(0, 217, 165, 0.3);">
+                <div class="card-body d-flex flex-column">
                     <h5 style="color: var(--success-color);"><i class="bi bi-egg-fried"></i> План питания</h5>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; flex-grow: 1;">
                         Создан: {{ latest_nutrition.created_at|date:"d.m.Y в H:i" }}<br>
                         Цель: {{ latest_nutrition.get_goal_display }}
                     </p>
-                    <a href="{% url 'accounts_web:view_nutrition_plan' latest_nutrition.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, var(--success-color), rgba(0, 217, 165, 0.7)); color: white;">
+                    <a href="{% url 'accounts_web:view_nutrition_plan' latest_nutrition.id %}" class="btn btn-sm mt-auto" style="background: linear-gradient(135deg, var(--success-color), rgba(0, 217, 165, 0.7)); color: white;">
                         <i class="bi bi-eye"></i> Посмотреть план
                     </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="border: 1px solid rgba(0, 217, 165, 0.2); opacity: 0.6;">
+                <div class="card-body d-flex flex-column">
+                    <h5 style="color: var(--success-color);"><i class="bi bi-egg-fried"></i> План питания</h5>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; flex-grow: 1;">
+                        У вас пока нет активного плана питания
+                    </p>
                 </div>
             </div>
         </div>
@@ -153,7 +175,7 @@
 
     <!-- History -->
     {% if workout_history or nutrition_history %}
-    <div class="row g-4">
+    <div class="row g-4 align-items-stretch">
         <div class="col-12">
             <h2 style="color: var(--text-light); font-weight: 700;">
                 <i class="bi bi-clock-history"></i> История планов
@@ -161,8 +183,8 @@
         </div>
 
         {% if workout_history %}
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-md-6 d-flex">
+            <div class="card w-100">
                 <div class="card-header" style="background: rgba(255, 107, 53, 0.1); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
                     <h5 class="mb-0" style="color: var(--text-light);">
                         <i class="bi bi-lightning-charge"></i> Программы тренировок
@@ -185,11 +207,24 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="opacity: 0.6;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.1); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light);">
+                        <i class="bi bi-lightning-charge"></i> Программы тренировок
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--text-muted);">История пока пуста</p>
+                </div>
+            </div>
+        </div>
         {% endif %}
 
         {% if nutrition_history %}
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-md-6 d-flex">
+            <div class="card w-100">
                 <div class="card-header" style="background: rgba(0, 217, 165, 0.1); border-bottom: 1px solid rgba(0, 217, 165, 0.3);">
                     <h5 class="mb-0" style="color: var(--text-light);">
                         <i class="bi bi-egg-fried"></i> Планы питания
@@ -212,10 +247,39 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="col-md-6 d-flex">
+            <div class="card w-100" style="opacity: 0.6;">
+                <div class="card-header" style="background: rgba(0, 217, 165, 0.1); border-bottom: 1px solid rgba(0, 217, 165, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light);">
+                        <i class="bi bi-egg-fried"></i> Планы питания
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--text-muted);">История пока пуста</p>
+                </div>
+            </div>
+        </div>
         {% endif %}
     </div>
     {% endif %}
 </div>
+
+<style>
+/* Стили для placeholder в форме */
+.form-control::placeholder {
+    color: rgba(200, 200, 200, 0.7) !important;
+    opacity: 1 !important;
+}
+
+.form-select {
+    color: var(--text-light);
+}
+
+.form-control {
+    color: var(--text-light);
+}
+</style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 {% endblock %}

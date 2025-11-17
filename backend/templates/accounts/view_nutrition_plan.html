@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_extras %}
 
 {% block title %}План питания - АС УСК{% endblock %}
 
@@ -28,7 +29,7 @@
             <div class="card">
                 <div class="card-body p-4">
                     <div class="nutrition-content" style="color: var(--text-light); line-height: 1.8;">
-                        {{ nutrition_plan.nutrition_content|safe|linebreaks }}
+                        {{ nutrition_plan.nutrition_content|markdown }}
                     </div>
                 </div>
             </div>
@@ -37,7 +38,7 @@
             <div class="card mt-4" style="border: 1px solid rgba(0, 217, 165, 0.3); background: rgba(0, 217, 165, 0.05);">
                 <div class="card-body">
                     <h5 style="color: var(--success-color);"><i class="bi bi-info-circle"></i> Диетические предпочтения</h5>
-                    <p style="color: var(--text-muted); margin-bottom: 0;">{{ nutrition_plan.dietary_preferences }}</p>
+                    <p style="color: var(--text-light); margin-bottom: 0;">{{ nutrition_plan.dietary_preferences }}</p>
                 </div>
             </div>
             {% endif %}
@@ -46,18 +47,146 @@
 </div>
 
 <style>
-.nutrition-content h1, .nutrition-content h2, .nutrition-content h3 {
+/* Заголовки */
+.nutrition-content h1 {
     color: var(--success-color);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--success-color);
+}
+
+.nutrition-content h2 {
+    color: rgba(0, 217, 165, 0.9);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid var(--success-color);
+}
+
+.nutrition-content h3 {
+    color: var(--info-color);
+    font-size: 1.2rem;
+    font-weight: 600;
     margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.nutrition-content h4 {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Таблицы */
+.nutrition-content table {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nutrition-content table thead {
+    background: linear-gradient(135deg, var(--success-color), rgba(0, 217, 165, 0.7));
+}
+
+.nutrition-content table thead th {
+    padding: 1rem;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    border: none;
+}
+
+.nutrition-content table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s;
+}
+
+.nutrition-content table tbody tr:hover {
+    background: rgba(0, 217, 165, 0.1);
+}
+
+.nutrition-content table tbody td {
+    padding: 0.8rem 1rem;
+    color: var(--text-light);
+    border: none;
+}
+
+.nutrition-content table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Списки */
+.nutrition-content ul, .nutrition-content ol {
+    margin-left: 1.5rem;
     margin-bottom: 1rem;
 }
 
-.nutrition-content strong {
+.nutrition-content ul li, .nutrition-content ol li {
+    margin-bottom: 0.5rem;
     color: var(--text-light);
 }
 
-.nutrition-content ul, .nutrition-content ol {
-    margin-left: 1.5rem;
+.nutrition-content ul li::marker {
+    color: var(--success-color);
+}
+
+/* Жирный текст и акценты */
+.nutrition-content strong, .nutrition-content b {
+    color: var(--warning-color);
+    font-weight: 600;
+}
+
+.nutrition-content em, .nutrition-content i {
+    color: var(--info-color);
+    font-style: italic;
+}
+
+/* Цитаты и блоки кода */
+.nutrition-content blockquote {
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 217, 165, 0.05);
+    border-left: 4px solid var(--success-color);
+    color: var(--text-muted);
+}
+
+.nutrition-content code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    color: var(--success-color);
+    font-family: 'Courier New', monospace;
+}
+
+.nutrition-content pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+/* Параграфы */
+.nutrition-content p {
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+/* Горизонтальные линии */
+.nutrition-content hr {
+    margin: 2rem 0;
+    border: none;
+    border-top: 2px solid rgba(0, 217, 165, 0.3);
 }
 </style>
 

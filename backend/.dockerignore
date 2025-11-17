@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Virtual Environment (НЕ копировать в Docker!)
+venv/
+env/
+ENV/
+.venv/
+
+# Django
+*.log
+*.pot
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+test_*.py
+list_*.py
+debug_*.py
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Documentation
+*.md
+docs/
+
+# Other
+.dockerignore
+Dockerfile
+docker-compose*.yml
+*.bak
+*.tmp
