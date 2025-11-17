@@ -6,19 +6,19 @@
 <div class="container mt-4">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Главная</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'classes_web:schedule' %}">Расписание</a></li>
-            <li class="breadcrumb-item active">{{ class.class_type.name }}</li>
+        <ol class="breadcrumb" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 10px;">
+            <li class="breadcrumb-item"><a href="/" style="color: var(--primary-color);">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'classes_web:schedule' %}" style="color: var(--primary-color);">Расписание</a></li>
+            <li class="breadcrumb-item active" style="color: var(--text-light);">{{ class.class_type.name }}</li>
         </ol>
     </nav>
 
     <div class="row">
         <!-- Main Info -->
         <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">
+            <div class="card mb-4" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h3 class="mb-0" style="color: var(--text-light); font-weight: 700;">
                         <i class="bi bi-calendar-check"></i>
                         {{ class.class_type.name }}
                     </h3>
@@ -26,36 +26,35 @@
                 <div class="card-body">
                     <!-- Date & Time -->
                     <div class="mb-4">
-                        <h5><i class="bi bi-clock"></i> Дата и время</h5>
-                        <p class="fs-5">
+                        <h5 style="color: var(--text-light); font-weight: 600;"><i class="bi bi-clock"></i> Дата и время</h5>
+                        <p class="fs-5" style="color: var(--text-light);">
                             <strong>{{ class.datetime|date:"d E Y (l)" }}</strong>
                             <br>
-                            {{ class.datetime|date:"H:i" }} -
-                            {{ class.datetime|date:"H:i"|add:class.duration_minutes }}
-                            ({{ class.duration_minutes }} минут)
+                            <span style="color: var(--primary-color);">{{ class.datetime|date:"H:i" }} - {{ class.datetime|date:"H:i"|add:class.duration_minutes }}</span>
+                            <span style="color: var(--text-muted);">({{ class.duration_minutes }} минут)</span>
                         </p>
                     </div>
 
                     <!-- Trainer -->
                     <div class="mb-4">
-                        <h5><i class="bi bi-person-badge"></i> Тренер</h5>
+                        <h5 style="color: var(--text-light); font-weight: 600;"><i class="bi bi-person-badge"></i> Тренер</h5>
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-1 fs-5">
+                                <p class="mb-1 fs-5" style="color: var(--text-light);">
                                     <strong>{{ class.trainer.profile.user.get_full_name }}</strong>
                                 </p>
-                                <p class="text-muted mb-0">{{ class.trainer.specialization }}</p>
-                                <small class="text-muted">Опыт: {{ class.trainer.experience_years }} лет</small>
+                                <p class="mb-0" style="color: var(--text-muted);">{{ class.trainer.specialization }}</p>
+                                <small style="color: var(--text-muted);">Опыт: {{ class.trainer.experience_years }} лет</small>
                             </div>
                         </div>
                     </div>
 
                     <!-- Room -->
                     <div class="mb-4">
-                        <h5><i class="bi bi-geo-alt"></i> Зал</h5>
-                        <p class="mb-1 fs-5"><strong>{{ class.room.name }}</strong></p>
-                        <p class="text-muted mb-1">Этаж: {{ class.room.floor }}</p>
-                        <p class="text-muted mb-0">
+                        <h5 style="color: var(--text-light); font-weight: 600;"><i class="bi bi-geo-alt"></i> Зал</h5>
+                        <p class="mb-1 fs-5" style="color: var(--text-light);"><strong>{{ class.room.name }}</strong></p>
+                        <p class="mb-1" style="color: var(--text-muted);">Этаж: {{ class.room.floor }}</p>
+                        <p class="mb-0" style="color: var(--text-muted);">
                             <i class="bi bi-tools"></i> Оборудование: {{ class.room.equipment }}
                         </p>
                     </div>
@@ -63,14 +62,14 @@
                     <!-- Description -->
                     {% if class.class_type.description %}
                     <div class="mb-4">
-                        <h5><i class="bi bi-info-circle"></i> Описание</h5>
-                        <p>{{ class.class_type.description }}</p>
+                        <h5 style="color: var(--text-light); font-weight: 600;"><i class="bi bi-info-circle"></i> Описание</h5>
+                        <p style="color: var(--text-muted);">{{ class.class_type.description }}</p>
                     </div>
                     {% endif %}
 
                     <!-- Notes -->
                     {% if class.notes %}
-                    <div class="alert alert-info">
+                    <div class="alert" style="background: rgba(0, 217, 165, 0.1); color: var(--success-color); border-left: 4px solid var(--success-color); border-radius: 10px;">
                         <i class="bi bi-exclamation-circle"></i>
                         <strong>Примечание:</strong> {{ class.notes }}
                     </div>
@@ -82,27 +81,27 @@
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Booking Card -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Запись на занятие</h5>
+            <div class="card mb-4" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">Запись на занятие</h5>
                 </div>
                 <div class="card-body">
                     <!-- Capacity -->
                     <div class="mb-3">
-                        <h6>Свободных мест:</h6>
+                        <h6 style="color: var(--text-light); font-weight: 600;">Свободных мест:</h6>
                         {% if class.available_spots > 0 %}
-                            <div class="progress" style="height: 30px;">
+                            <div class="progress" style="height: 30px; background: rgba(0, 0, 0, 0.3);">
                                 {% widthratio class.available_spots class.max_capacity 100 as spots_percent %}
-                                <div class="progress-bar bg-success" role="progressbar"
-                                     style="width: {{ spots_percent }}%;"
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: {{ spots_percent }}%; background: linear-gradient(90deg, var(--success-color), rgba(0, 217, 165, 0.7));"
                                      aria-valuenow="{{ class.available_spots }}"
                                      aria-valuemin="0"
                                      aria-valuemax="{{ class.max_capacity }}">
-                                    {{ class.available_spots }} из {{ class.max_capacity }}
+                                    <strong style="color: white;">{{ class.available_spots }} из {{ class.max_capacity }}</strong>
                                 </div>
                             </div>
                         {% else %}
-                            <div class="alert alert-danger mb-0">
+                            <div class="alert mb-0" style="background: rgba(255, 107, 53, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 10px;">
                                 <i class="bi bi-x-circle"></i> Мест нет
                             </div>
                         {% endif %}
@@ -112,10 +111,10 @@
                     {% if user.is_authenticated %}
                         {% if class.available_spots > 0 and not class.is_past %}
                             {% if is_booked %}
-                                <button class="btn btn-outline-secondary w-100" disabled>
+                                <button class="btn w-100" disabled style="background: rgba(0, 217, 165, 0.2); color: var(--success-color); border: 1px solid var(--success-color);">
                                     <i class="bi bi-check-circle"></i> Вы уже записаны
                                 </button>
-                                <a href="{% url 'bookings_web:my_bookings' %}" class="btn btn-link w-100">
+                                <a href="{% url 'bookings_web:my_bookings' %}" class="btn btn-link w-100" style="color: var(--primary-color);">
                                     Посмотреть мои бронирования
                                 </a>
                             {% else %}
@@ -125,17 +124,17 @@
                                         <i class="bi bi-plus-circle"></i> Записаться
                                     </button>
                                 </form>
-                                <small class="text-muted mt-2 d-block">
+                                <small class="mt-2 d-block" style="color: var(--text-muted);">
                                     <i class="bi bi-info-circle"></i>
                                     Отмена возможна за 24 часа до занятия
                                 </small>
                             {% endif %}
                         {% elif class.is_past %}
-                            <button class="btn btn-secondary w-100" disabled>
+                            <button class="btn w-100" disabled style="background: rgba(155, 163, 180, 0.2); color: var(--text-muted); border: 1px solid var(--text-muted);">
                                 <i class="bi bi-clock-history"></i> Занятие прошло
                             </button>
                         {% else %}
-                            <button class="btn btn-danger w-100" disabled>
+                            <button class="btn w-100" disabled style="background: rgba(255, 107, 53, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color);">
                                 <i class="bi bi-x-circle"></i> Мест нет
                             </button>
                         {% endif %}
@@ -148,25 +147,25 @@
             </div>
 
             <!-- Status Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Статус</h5>
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">Статус</h5>
                 </div>
                 <div class="card-body">
                     {% if class.status == 'SCHEDULED' %}
-                        <span class="badge bg-success fs-6">
+                        <span class="badge fs-6" style="background: rgba(0, 217, 165, 0.2); color: var(--success-color); border: 1px solid var(--success-color); padding: 0.75rem 1.5rem;">
                             <i class="bi bi-check-circle"></i> Запланировано
                         </span>
                     {% elif class.status == 'IN_PROGRESS' %}
-                        <span class="badge bg-info fs-6">
+                        <span class="badge fs-6" style="background: rgba(0, 217, 165, 0.2); color: var(--success-color); border: 1px solid var(--success-color); padding: 0.75rem 1.5rem;">
                             <i class="bi bi-clock-history"></i> В процессе
                         </span>
                     {% elif class.status == 'COMPLETED' %}
-                        <span class="badge bg-secondary fs-6">
+                        <span class="badge fs-6" style="background: rgba(155, 163, 180, 0.2); color: var(--text-muted); border: 1px solid var(--text-muted); padding: 0.75rem 1.5rem;">
                             <i class="bi bi-check-all"></i> Завершено
                         </span>
                     {% elif class.status == 'CANCELLED' %}
-                        <span class="badge bg-danger fs-6">
+                        <span class="badge fs-6" style="background: rgba(255, 107, 53, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.75rem 1.5rem;">
                             <i class="bi bi-x-circle"></i> Отменено
                         </span>
                     {% endif %}
@@ -177,7 +176,7 @@
 
     <!-- Back Button -->
     <div class="mt-4">
-        <a href="{% url 'classes_web:schedule' %}" class="btn btn-outline-secondary">
+        <a href="{% url 'classes_web:schedule' %}" class="btn btn-outline-primary">
             <i class="bi bi-arrow-left"></i> Вернуться к расписанию
         </a>
     </div>

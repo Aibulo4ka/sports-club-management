@@ -19,4 +19,7 @@ urlpatterns = [
     # Profile pages
     path('profile/', views_web.profile_view, name='profile'),
     path('profile/edit/', views_web.edit_profile_view, name='edit_profile'),
+
+    # Trainers
+    path('trainers/', views_web.trainers_list, name='trainers_list'),
 ]

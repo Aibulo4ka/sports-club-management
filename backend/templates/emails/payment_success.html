@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Успешная оплата</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #FF6B35;
+        }
+        .header h1 {
+            color: #FF6B35;
+            margin: 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .success-icon {
+            text-align: center;
+            font-size: 60px;
+            color: #00D9A5;
+            margin: 20px 0;
+        }
+        .details {
+            background-color: #f9f9f9;
+            border-left: 4px solid #FF6B35;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .details-row:last-child {
+            border-bottom: none;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+        }
+        .value {
+            color: #333;
+        }
+        .total {
+            font-size: 24px;
+            color: #FF6B35;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #FF6B35;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>АС УСК</h1>
+            <p>Автоматизированная система управления спортивным клубом</p>
+        </div>
+
+        <div class="content">
+            <div class="success-icon">✓</div>
+
+            <h2 style="text-align: center; color: #00D9A5;">Оплата успешно выполнена!</h2>
+
+            <p>Здравствуйте, {{ user.get_full_name|default:user.username }}!</p>
+
+            <p>Ваш платёж успешно обработан. Спасибо за покупку!</p>
+
+            <div class="details">
+                <h3 style="margin-top: 0; color: #FF6B35;">Детали платежа:</h3>
+
+                <div class="details-row">
+                    <span class="label">Номер платежа:</span>
+                    <span class="value">#{{ payment.id }}</span>
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Дата оплаты:</span>
+                    <span class="value">{{ payment.completed_at|date:"d.m.Y H:i" }}</span>
+                </div>
+
+                {% if membership %}
+                <div class="details-row">
+                    <span class="label">Абонемент:</span>
+                    <span class="value">{{ membership.membership_type.name }}</span>
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Срок действия:</span>
+                    <span class="value">{{ membership.start_date|date:"d.m.Y" }} - {{ membership.end_date|date:"d.m.Y" }}</span>
+                </div>
+                {% endif %}
+
+                <div class="details-row">
+                    <span class="label">Способ оплаты:</span>
+                    <span class="value">{{ payment.get_payment_method_display }}</span>
+                </div>
+
+                <div class="details-row" style="padding-top: 15px;">
+                    <span class="label">Итого:</span>
+                    <span class="total">{{ payment.amount }} ₽</span>
+                </div>
+            </div>
+
+            {% if membership %}
+            <p style="background: #e8f8f3; padding: 15px; border-radius: 5px; border-left: 4px solid #00D9A5;">
+                <strong>Ваш абонемент активирован!</strong><br>
+                Теперь вы можете записываться на занятия в расписании.
+            </p>
+            {% endif %}
+
+            <div style="text-align: center;">
+                <a href="http://localhost:8000/memberships/my/" class="button">Мои абонементы</a>
+                <a href="http://localhost:8000/classes/schedule/" class="button" style="background-color: #00D9A5;">Расписание занятий</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Это автоматическое письмо, отвечать на него не нужно.</p>
+            <p>&copy; 2025 АС УСК. Все права защищены.</p>
+        </div>
+    </div>
+</body>
+</html>

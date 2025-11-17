@@ -6,8 +6,8 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="display-5"><i class="bi bi-credit-card"></i> История платежей</h1>
-            <p class="text-muted">Все ваши транзакции и оплаты</p>
+            <h1 class="display-5" style="color: var(--text-light); font-weight: 900;"><i class="bi bi-credit-card"></i> История платежей</h1>
+            <p style="color: var(--text-muted);">Все ваши транзакции и оплаты</p>
         </div>
     </div>
 
@@ -25,19 +25,23 @@
         <div class="col-12">
             <div class="btn-group" role="group">
                 <a href="{% url 'payments_web:my_payments' %}"
-                   class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">
+                   class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                   style="{% if not status_filter %}{% else %}border-color: rgba(255, 107, 53, 0.5); color: var(--primary-color);{% endif %}">
                     Все
                 </a>
                 <a href="?status=PENDING"
-                   class="btn btn-outline-warning {% if status_filter == 'PENDING' %}active{% endif %}">
+                   class="btn {% if status_filter == 'PENDING' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                   style="{% if status_filter == 'PENDING' %}{% else %}border-color: rgba(255, 107, 53, 0.5); color: var(--primary-color);{% endif %}">
                     Ожидают оплаты
                 </a>
                 <a href="?status=COMPLETED"
-                   class="btn btn-outline-success {% if status_filter == 'COMPLETED' %}active{% endif %}">
+                   class="btn {% if status_filter == 'COMPLETED' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                   style="{% if status_filter == 'COMPLETED' %}{% else %}border-color: rgba(255, 107, 53, 0.5); color: var(--primary-color);{% endif %}">
                     Оплачены
                 </a>
                 <a href="?status=FAILED"
-                   class="btn btn-outline-danger {% if status_filter == 'FAILED' %}active{% endif %}">
+                   class="btn {% if status_filter == 'FAILED' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                   style="{% if status_filter == 'FAILED' %}{% else %}border-color: rgba(255, 107, 53, 0.5); color: var(--primary-color);{% endif %}">
                     Неудачные
                 </a>
             </div>
@@ -48,18 +52,18 @@
     {% if pending_payments %}
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-3"><i class="bi bi-clock-history"></i> Ожидают оплаты</h3>
+            <h3 class="mb-3" style="color: var(--text-light);"><i class="bi bi-clock-history"></i> Ожидают оплаты</h3>
             {% for payment in pending_payments %}
-            <div class="card border-warning mb-3">
-                <div class="card-header bg-warning text-dark">
-                    <strong>Платёж #{{ payment.id }}</strong> - {{ payment.amount }} руб.
+            <div class="card mb-3" style="background: var(--dark-card); border: 2px solid rgba(255, 193, 7, 0.3);">
+                <div class="card-header" style="background: rgba(255, 193, 7, 0.15); border: none;">
+                    <strong style="color: var(--text-light);">Платёж #{{ payment.id }}</strong> - <span style="color: var(--secondary-color);">{{ payment.amount }} ₽</span>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
                             <dl class="row mb-0">
-                                <dt class="col-sm-4">Абонемент:</dt>
-                                <dd class="col-sm-8">
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Абонемент:</dt>
+                                <dd class="col-sm-8" style="color: var(--text-light);">
                                     {% if payment.membership %}
                                         {{ payment.membership.membership_type.name }}
                                     {% else %}
@@ -67,14 +71,14 @@
                                     {% endif %}
                                 </dd>
 
-                                <dt class="col-sm-4">Сумма:</dt>
-                                <dd class="col-sm-8"><strong>{{ payment.amount }} руб.</strong></dd>
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Сумма:</dt>
+                                <dd class="col-sm-8"><strong style="color: var(--primary-color);">{{ payment.amount }} ₽</strong></dd>
 
-                                <dt class="col-sm-4">Создан:</dt>
-                                <dd class="col-sm-8">{{ payment.created_at|date:"d.m.Y H:i" }}</dd>
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Создан:</dt>
+                                <dd class="col-sm-8" style="color: var(--text-light);">{{ payment.created_at|date:"d.m.Y H:i" }}</dd>
 
-                                <dt class="col-sm-4">Способ оплаты:</dt>
-                                <dd class="col-sm-8">{{ payment.get_payment_method_display }}</dd>
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Способ оплаты:</dt>
+                                <dd class="col-sm-8" style="color: var(--text-light);">{{ payment.get_payment_method_display }}</dd>
                             </dl>
                         </div>
                         <div class="col-md-4 text-end">
@@ -83,7 +87,7 @@
                                     <i class="bi bi-credit-card"></i> Оплатить
                                 </a>
                             {% else %}
-                                <p class="text-muted"><small>Ожидание формирования платежа...</small></p>
+                                <p style="color: var(--text-muted);"><small>Ожидание формирования платежа...</small></p>
                             {% endif %}
                         </div>
                     </div>
@@ -98,41 +102,44 @@
     {% if completed_payments %}
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-3"><i class="bi bi-check-circle"></i> Завершённые платежи</h3>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Дата</th>
-                            <th>Абонемент</th>
-                            <th>Сумма</th>
-                            <th>Способ</th>
-                            <th>Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in completed_payments %}
-                        <tr>
-                            <td>{{ payment.id }}</td>
-                            <td>{{ payment.completed_at|date:"d.m.Y H:i" }}</td>
-                            <td>
-                                {% if payment.membership %}
-                                    {{ payment.membership.membership_type.name }}
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-                            <td><strong>{{ payment.amount }} руб.</strong></td>
-                            <td>{{ payment.get_payment_method_display }}</td>
-                            <td>
-                                <span class="badge bg-success">{{ payment.get_status_display }}</span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <h3 class="mb-3" style="color: var(--text-light);"><i class="bi bi-check-circle"></i> Завершённые платежи</h3>
+            {% for payment in completed_payments %}
+            <div class="card mb-3" style="background: var(--dark-card); border: 2px solid rgba(0, 217, 165, 0.3);">
+                <div class="card-header" style="background: rgba(0, 217, 165, 0.15); border: none;">
+                    <strong style="color: var(--text-light);">Платёж #{{ payment.id }}</strong> - <span style="color: var(--success-color);">{{ payment.amount }} ₽</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3" style="color: var(--text-muted); font-weight: 600;">Абонемент:</dt>
+                                <dd class="col-sm-9" style="color: var(--text-light);">
+                                    {% if payment.membership %}
+                                        {{ payment.membership.membership_type.name }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-3" style="color: var(--text-muted); font-weight: 600;">Сумма:</dt>
+                                <dd class="col-sm-9"><strong style="color: var(--primary-color);">{{ payment.amount }} ₽</strong></dd>
+
+                                <dt class="col-sm-3" style="color: var(--text-muted); font-weight: 600;">Дата оплаты:</dt>
+                                <dd class="col-sm-9" style="color: var(--text-light);">{{ payment.completed_at|date:"d.m.Y H:i" }}</dd>
+
+                                <dt class="col-sm-3" style="color: var(--text-muted); font-weight: 600;">Способ оплаты:</dt>
+                                <dd class="col-sm-9" style="color: var(--text-light);">{{ payment.get_payment_method_display }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-3 text-end d-flex align-items-center justify-content-end">
+                            <span class="badge" style="background: rgba(0, 217, 165, 0.2); color: var(--success-color); border: 1px solid var(--success-color); padding: 0.75rem 1.5rem; font-size: 1rem;">
+                                <i class="bi bi-check-circle-fill"></i> {{ payment.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
     </div>
     {% endif %}
@@ -141,67 +148,70 @@
     {% if failed_payments %}
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-3"><i class="bi bi-x-circle"></i> Неудачные платежи</h3>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Дата</th>
-                            <th>Абонемент</th>
-                            <th>Сумма</th>
-                            <th>Статус</th>
-                            <th>Действие</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in failed_payments %}
-                        <tr>
-                            <td>{{ payment.id }}</td>
-                            <td>{{ payment.created_at|date:"d.m.Y H:i" }}</td>
-                            <td>
-                                {% if payment.membership %}
-                                    {{ payment.membership.membership_type.name }}
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-                            <td>{{ payment.amount }} руб.</td>
-                            <td>
-                                <span class="badge bg-danger">{{ payment.get_status_display }}</span>
-                            </td>
-                            <td>
-                                {% if payment.membership %}
-                                    <a href="{% url 'memberships_web:purchase' payment.membership.membership_type.id %}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Попробовать снова
-                                    </a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <h3 class="mb-3" style="color: var(--text-light);"><i class="bi bi-x-circle"></i> Неудачные платежи</h3>
+            {% for payment in failed_payments %}
+            <div class="card mb-3" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3);">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border: none;">
+                    <strong style="color: var(--text-light);">Платёж #{{ payment.id }}</strong> - <span style="color: var(--primary-color);">{{ payment.amount }} ₽</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Абонемент:</dt>
+                                <dd class="col-sm-8" style="color: var(--text-light);">
+                                    {% if payment.membership %}
+                                        {{ payment.membership.membership_type.name }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Сумма:</dt>
+                                <dd class="col-sm-8"><strong style="color: var(--primary-color);">{{ payment.amount }} ₽</strong></dd>
+
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Попытка оплаты:</dt>
+                                <dd class="col-sm-8" style="color: var(--text-light);">{{ payment.created_at|date:"d.m.Y H:i" }}</dd>
+
+                                <dt class="col-sm-4" style="color: var(--text-muted); font-weight: 600;">Статус:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge" style="background: rgba(255, 107, 53, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.5rem 1rem;">
+                                        <i class="bi bi-x-circle"></i> {{ payment.get_status_display }}
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+                            {% if payment.membership %}
+                                <a href="{% url 'memberships_web:purchase' payment.membership.membership_type.id %}"
+                                   class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i> Попробовать снова
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
     </div>
     {% endif %}
 
     <!-- Нет платежей -->
     {% if not pending_payments and not completed_payments and not failed_payments %}
-        <div class="alert alert-info">
+        <div class="alert" style="background: rgba(0, 217, 165, 0.1); color: var(--success-color); border-left: 4px solid var(--success-color); border-radius: 15px;">
             <i class="bi bi-info-circle"></i> У вас пока нет платежей.
-            <a href="{% url 'memberships_web:catalog' %}" class="alert-link">Купить абонемент</a>
+            <a href="{% url 'memberships_web:catalog' %}" style="color: var(--primary-color); text-decoration: underline;">Купить абонемент</a>
         </div>
     {% endif %}
 
     <!-- Быстрые действия -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card bg-light">
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Хотите приобрести абонемент?</h5>
-                    <p class="card-text">Выберите подходящий тариф и начните тренировки!</p>
+                    <h5 class="card-title" style="color: var(--text-light); font-weight: 700;">Хотите приобрести абонемент?</h5>
+                    <p class="card-text" style="color: var(--text-muted);">Выберите подходящий тариф и начните тренировки!</p>
                     <a href="{% url 'memberships_web:catalog' %}" class="btn btn-primary">
                         <i class="bi bi-arrow-right-circle"></i> Перейти к каталогу
                     </a>

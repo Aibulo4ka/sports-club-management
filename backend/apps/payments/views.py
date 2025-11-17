@@ -272,10 +272,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
                         payment.membership.save()
                         logger.info(f"Membership {payment.membership.id} activated")
 
-                    # TODO: Отправить уведомление клиенту через Observer pattern
-                    # from core.patterns.observer import PaymentSubject
-                    # payment_subject = PaymentSubject()
-                    # payment_subject.payment_completed(payment)
+                    # Отправляем email уведомление об успешной оплате
+                    try:
+                        from apps.core.email_utils import send_payment_success_email
+                        send_payment_success_email(payment)
+                        logger.info(f"Payment success email sent to {payment.client.profile.user.email}")
+                    except Exception as email_error:
+                        logger.error(f"Failed to send payment email: {str(email_error)}")
 
                 elif yookassa_status == 'canceled':
                     # Платёж отменён

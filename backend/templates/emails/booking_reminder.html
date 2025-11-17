@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Напоминание о занятии</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #FF6B35;
+        }
+        .header h1 {
+            color: #FF6B35;
+            margin: 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .reminder-icon {
+            text-align: center;
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        .class-card {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .class-card h2 {
+            margin: 0 0 15px 0;
+            font-size: 28px;
+        }
+        .class-card .time {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .details {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 30px;
+        }
+        .detail-text {
+            flex: 1;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .detail-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 40px;
+            background-color: #FF6B35;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .tips {
+            background-color: #e8f8f3;
+            border-left: 4px solid #00D9A5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .tips h3 {
+            margin-top: 0;
+            color: #00D9A5;
+        }
+        .tips ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>АС УСК</h1>
+            <p>Автоматизированная система управления спортивным клубом</p>
+        </div>
+
+        <div class="content">
+            <div class="reminder-icon">⏰</div>
+
+            <h2 style="text-align: center; color: #FF6B35;">Напоминание о занятии</h2>
+
+            <p>Здравствуйте, {{ user.get_full_name|default:user.username }}!</p>
+
+            <p>Напоминаем, что через <strong style="color: #FF6B35;">2 часа</strong> у вас запланировано занятие:</p>
+
+            <div class="class-card">
+                <h2>{{ class.class_type.name }}</h2>
+                <div>{{ class.datetime|date:"d E Y (l)" }}</div>
+                <div class="time">{{ class.datetime|date:"H:i" }}</div>
+                <div>Продолжительность: {{ class.duration_minutes }} минут</div>
+            </div>
+
+            <div class="details">
+                <div class="detail-item">
+                    <div class="detail-icon">👨‍🏫</div>
+                    <div class="detail-text">
+                        <div class="detail-label">Тренер</div>
+                        <div class="detail-value">{{ class.trainer.profile.user.get_full_name }}</div>
+                        <div style="font-size: 13px; color: #666;">{{ class.trainer.specialization }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">📍</div>
+                    <div class="detail-text">
+                        <div class="detail-label">Зал</div>
+                        <div class="detail-value">{{ class.room.name }}</div>
+                        <div style="font-size: 13px; color: #666;">Этаж {{ class.room.floor }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">👥</div>
+                    <div class="detail-text">
+                        <div class="detail-label">Участники</div>
+                        <div class="detail-value">{{ class.current_capacity }} из {{ class.max_capacity }} мест</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips">
+                <h3>Подготовка к занятию:</h3>
+                <ul>
+                    <li>Приходите за 10-15 минут до начала</li>
+                    <li>Возьмите с собой воду и полотенце</li>
+                    <li>Не забудьте спортивную форму и обувь</li>
+                    <li>При плохом самочувствии лучше отменить бронирование</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="http://localhost:8000/bookings/my/" class="button">Мои бронирования</a>
+            </div>
+
+            <p style="text-align: center; color: #666; margin-top: 30px;">
+                <small>Если вы не можете прийти, пожалуйста, отмените бронирование,<br>чтобы освободить место для других участников.</small>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>Это автоматическое письмо, отвечать на него не нужно.</p>
+            <p>&copy; 2025 АС УСК. Все права защищены.</p>
+        </div>
+    </div>
+</body>
+</html>

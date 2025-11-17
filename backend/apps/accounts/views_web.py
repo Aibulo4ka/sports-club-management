@@ -194,3 +194,21 @@ def edit_profile_view(request):
         'user': request.user,
         'profile': profile
     })
+
+
+def trainers_list(request):
+    """
+    Страница со списком тренеров
+    """
+    from .models import Trainer
+
+    # Получаем всех активных тренеров
+    trainers = Trainer.objects.filter(
+        is_active=True
+    ).select_related(
+        'profile__user'
+    ).order_by('-experience_years')
+
+    return render(request, 'accounts/trainers_list.html', {
+        'trainers': trainers
+    })

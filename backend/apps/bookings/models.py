@@ -3,6 +3,7 @@ Models for bookings app: Booking, Visit
 """
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from apps.accounts.models import Client
@@ -40,6 +41,40 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.client} - {self.class_instance} ({self.get_status_display()})"
+
+    def clean(self):
+        """
+        Валидация на уровне модели
+        Проверяет, что у клиента есть активный абонемент на дату занятия
+        """
+        super().clean()
+
+        # Пропускаем валидацию для обновления существующих записей
+        if self.pk:
+            return
+
+        # Проверяем активный абонемент на дату занятия
+        from apps.memberships.models import MembershipStatus
+
+        active_membership = self.client.memberships.filter(
+            status=MembershipStatus.ACTIVE,
+            start_date__lte=self.class_instance.datetime.date(),
+            end_date__gte=self.class_instance.datetime.date()
+        ).first()
+
+        if not active_membership:
+            raise ValidationError({
+                'class_instance': f'У клиента {self.client} нет активного абонемента на дату занятия '
+                                f'{self.class_instance.datetime.date()}. '
+                                f'Абонемент должен быть активен с {self.class_instance.datetime.date()}.'
+            })
+
+        # Проверяем остаток посещений
+        if active_membership.visits_remaining is not None:
+            if active_membership.visits_remaining <= 0:
+                raise ValidationError({
+                    'client': f'У абонемента {active_membership} закончились посещения'
+                })
 
     @property
     def can_cancel(self):
