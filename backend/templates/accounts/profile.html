@@ -4,53 +4,128 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row">
+    <div class="row g-4">
+        <!-- Левая колонка с аватаром -->
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Фото профиля">
-                    <h4>{{ user.get_full_name|default:user.username }}</h4>
-                    <p class="text-muted">{{ profile.get_role_display }}</p>
-                    <p><i class="bi bi-envelope"></i> {{ user.email }}</p>
-                    <p><i class="bi bi-phone"></i> {{ profile.phone }}</p>
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
+                <div class="card-body text-center p-4">
+                    <div style="width: 150px; height: 150px; margin: 0 auto;" class="mb-3">
+                        {% if profile.avatar == 'avatar1.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-person-arms-up" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar2.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-person-walking" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar3.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-lightning-charge-fill" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar4.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-heart-pulse-fill" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar5.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-fire" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar6.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-trophy-fill" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar7.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-bicycle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% elif profile.avatar == 'avatar8.png' %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-stars" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% else %}
+                            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary-color);">
+                                <i class="bi bi-person-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h3 style="color: var(--text-light); font-weight: 700; margin-bottom: 0.5rem;">{{ user.get_full_name|default:user.username }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">{{ profile.get_role_display }}</p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounts_web:edit_profile' %}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Редактировать профиль
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Правая колонка с информацией -->
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Информация о профиле</h5>
+            <div class="card mb-3" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border: none; padding: 1rem 1.5rem;">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 600;"><i class="bi bi-person-circle"></i> Основная информация</h5>
                 </div>
-                <div class="card-body">
-                    <table class="table">
-                        <tr>
-                            <th>Имя пользователя:</th>
-                            <td>{{ user.username }}</td>
-                        </tr>
-                        <tr>
-                            <th>Email:</th>
-                            <td>{{ user.email }}</td>
-                        </tr>
-                        <tr>
-                            <th>Телефон:</th>
-                            <td>{{ profile.phone }}</td>
-                        </tr>
-                        <tr>
-                            <th>Дата рождения:</th>
-                            <td>{{ profile.date_of_birth|default:"Не указано" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Адрес:</th>
-                            <td>{{ profile.address|default:"Не указан" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Дата регистрации:</th>
-                            <td>{{ profile.created_at|date:"d.m.Y" }}</td>
-                        </tr>
-                    </table>
-                    <a href="{% url 'accounts_web:edit_profile' %}" class="btn btn-primary">
-                        <i class="bi bi-pencil"></i> Редактировать профиль
-                    </a>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Имя пользователя</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">{{ user.username }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Телефон</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">
+                                    <i class="bi bi-phone" style="color: var(--primary-color);"></i> {{ profile.phone }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">
+                                    <i class="bi bi-envelope" style="color: var(--primary-color);"></i> {{ user.email }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Дата рождения</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">
+                                    <i class="bi bi-calendar" style="color: var(--primary-color);"></i> {{ profile.date_of_birth|default:"Не указано" }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Дата регистрации</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">
+                                    <i class="bi bi-clock-history" style="color: var(--primary-color);"></i> {{ profile.created_at|date:"d.m.Y" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if profile.address %}
+                    <div class="row">
+                        <div class="col-12">
+                            <div>
+                                <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Адрес</label>
+                                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 0; margin-top: 0.25rem;">
+                                    <i class="bi bi-geo-alt" style="color: var(--primary-color);"></i> {{ profile.address }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -48,6 +48,7 @@ def register_view(request):
         first_name = request.POST.get('first_name', '')
         last_name = request.POST.get('last_name', '')
         phone = request.POST.get('phone')
+        avatar = request.POST.get('avatar', 'avatar1.png')
 
         # Basic validation
         if not all([username, email, password, password2, phone]):
@@ -92,7 +93,8 @@ def register_view(request):
                 profile = Profile.objects.create(
                     user=user,
                     phone=phone,
-                    role=UserRole.CLIENT
+                    role=UserRole.CLIENT,
+                    avatar=avatar
                 )
 
                 # Create client
@@ -145,6 +147,7 @@ def edit_profile_view(request):
         phone = request.POST.get('phone', '')
         date_of_birth = request.POST.get('date_of_birth', '')
         address = request.POST.get('address', '')
+        avatar = request.POST.get('avatar', profile.avatar)
 
         # Валидация email на уникальность (если изменился)
         from django.contrib.auth.models import User
@@ -169,6 +172,7 @@ def edit_profile_view(request):
                 # Обновляем профиль
                 profile.phone = phone
                 profile.address = address
+                profile.avatar = avatar
 
                 # Обновляем дату рождения (если указана)
                 if date_of_birth:

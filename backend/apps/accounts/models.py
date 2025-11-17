@@ -40,7 +40,25 @@ class Profile(models.Model):
     )
     date_of_birth = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
 
+    # Avatar choices
+    AVATAR_CHOICES = [
+        ('avatar1.png', 'Аватар 1 - Спортсмен'),
+        ('avatar2.png', 'Аватар 2 - Гимнаст'),
+        ('avatar3.png', 'Аватар 3 - Боксёр'),
+        ('avatar4.png', 'Аватар 4 - Йог'),
+        ('avatar5.png', 'Аватар 5 - Фитнес'),
+        ('avatar6.png', 'Аватар 6 - Силач'),
+        ('avatar7.png', 'Аватар 7 - Бегун'),
+        ('avatar8.png', 'Аватар 8 - Пловец'),
+    ]
+
     # Additional fields
+    avatar = models.CharField(
+        max_length=20,
+        choices=AVATAR_CHOICES,
+        default='avatar1.png',
+        verbose_name='Аватар'
+    )
     photo = models.ImageField(upload_to='profiles/', null=True, blank=True, verbose_name='Фото')
     address = models.TextField(blank=True, verbose_name='Адрес')
 

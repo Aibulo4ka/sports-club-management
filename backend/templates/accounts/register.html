@@ -6,9 +6,9 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
+            <div class="card shadow" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
                 <div class="card-body p-5">
-                    <h2 class="card-title text-center mb-4">Регистрация</h2>
+                    <h2 class="card-title text-center mb-4" style="color: var(--text-light); font-weight: 700;">Регистрация</h2>
 
                     {% if messages %}
                         {% for message in messages %}
@@ -55,6 +55,9 @@
                                    placeholder="+7 (999) 123-45-67" required>
                         </div>
 
+                        <!-- Avatar Selection -->
+                        {% include 'components/avatar_selector.html' with selected_avatar='avatar1.png' %}
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="password" class="form-label">Пароль <span class="text-danger">*</span></label>
@@ -82,10 +85,10 @@
                 </div>
             </div>
 
-            <div class="card mt-3">
+            <div class="card mt-3" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2);">
                 <div class="card-body">
-                    <h6 class="card-title"><i class="bi bi-info-circle"></i> Информация</h6>
-                    <ul class="mb-0">
+                    <h6 class="card-title" style="color: var(--text-light);"><i class="bi bi-info-circle"></i> Информация</h6>
+                    <ul class="mb-0" style="color: var(--text-muted);">
                         <li>После регистрации вы автоматически войдёте в систему</li>
                         <li>Вы сможете просматривать расписание занятий</li>
                         <li>Вы сможете покупать абонементы и бронировать занятия</li>

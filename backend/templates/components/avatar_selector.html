@@ -1,0 +1,110 @@
+<!-- Avatar Selector Component -->
+<div class="avatar-selector mb-4">
+    <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem; display: block;">
+        Выберите аватар
+    </label>
+
+    <div class="row g-3">
+        <!-- Avatar 1 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar1" value="avatar1.png" {% if selected_avatar == 'avatar1.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar1" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-person-arms-up" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Спортсмен</small>
+            </label>
+        </div>
+
+        <!-- Avatar 2 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar2" value="avatar2.png" {% if selected_avatar == 'avatar2.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar2" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-person-walking" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Гимнаст</small>
+            </label>
+        </div>
+
+        <!-- Avatar 3 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar3" value="avatar3.png" {% if selected_avatar == 'avatar3.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar3" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Боксёр</small>
+            </label>
+        </div>
+
+        <!-- Avatar 4 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar4" value="avatar4.png" {% if selected_avatar == 'avatar4.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar4" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-heart-pulse-fill" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Йог</small>
+            </label>
+        </div>
+
+        <!-- Avatar 5 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar5" value="avatar5.png" {% if selected_avatar == 'avatar5.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar5" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-fire" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Фитнес</small>
+            </label>
+        </div>
+
+        <!-- Avatar 6 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar6" value="avatar6.png" {% if selected_avatar == 'avatar6.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar6" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-trophy-fill" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Силач</small>
+            </label>
+        </div>
+
+        <!-- Avatar 7 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar7" value="avatar7.png" {% if selected_avatar == 'avatar7.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar7" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-bicycle" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Бегун</small>
+            </label>
+        </div>
+
+        <!-- Avatar 8 -->
+        <div class="col-6 col-md-3">
+            <input type="radio" class="btn-check" name="avatar" id="avatar8" value="avatar8.png" {% if selected_avatar == 'avatar8.png' %}checked{% endif %}>
+            <label class="btn w-100 p-3" for="avatar8" style="background: var(--dark-card); border: 2px solid rgba(255, 107, 53, 0.3); border-radius: 15px; transition: all 0.3s;">
+                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-stars" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Пловец</small>
+            </label>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-selector .btn-check:checked + label {
+    border-color: var(--primary-color) !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+.avatar-selector label:hover {
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+</style>
