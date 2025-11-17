@@ -54,3 +54,8 @@ celerybeat.pid
 
 # Notes and documentation
 Study.txt
+
+# Claude Code
+.claude
+.claude/
+*.claude

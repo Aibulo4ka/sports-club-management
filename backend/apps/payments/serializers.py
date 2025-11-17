@@ -96,14 +96,16 @@ class PaymentCreateSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """
-        Создает запись платежа
-        Позже здесь будет интеграция с YooKassa API
+        Создает запись платежа и инициирует оплату в YooKassa
         """
         from apps.memberships.models import MembershipType, Membership
         from apps.memberships.pricing import PriceCalculator, get_best_discount_strategy
         from datetime import timedelta
+        from .yookassa_service import get_yookassa_service
+        from django.conf import settings
 
         client = self.context['client']
+        request = self.context.get('request')
         membership_type = MembershipType.objects.get(id=validated_data['membership_type_id'])
 
         # Рассчитываем цену со скидкой используя паттерн Strategy
@@ -134,7 +136,7 @@ class PaymentCreateSerializer(serializers.Serializer):
             visits_remaining=membership_type.visits_limit
         )
 
-        # Создаем платеж
+        # Создаем платеж в БД
         payment = Payment.objects.create(
             client=client,
             membership=membership,
@@ -144,8 +146,43 @@ class PaymentCreateSerializer(serializers.Serializer):
             notes=f"Скидка применена: {price_info['discount_description']}"
         )
 
-        # TODO: Здесь будет интеграция с YooKassa API для получения payment_url
-        # Пока только создаем запись платежа
+        # Интеграция с YooKassa (только для YOOKASSA метода)
+        if validated_data['payment_method'] == PaymentMethod.YOOKASSA:
+            try:
+                yookassa = get_yookassa_service()
+
+                # Формируем return_url (куда вернуть клиента после оплаты)
+                if request:
+                    base_url = request.build_absolute_uri('/')[:-1]
+                else:
+                    base_url = settings.ALLOWED_HOSTS[0]
+
+                return_url = f"{base_url}/payments/success/?payment_id={payment.id}"
+
+                # Создаём платёж в YooKassa
+                yookassa_payment = yookassa.create_payment(
+                    amount=final_price,
+                    description=f"Абонемент {membership_type.name}",
+                    client_email=client.profile.user.email,
+                    return_url=return_url,
+                    metadata={
+                        "payment_id": str(payment.id),
+                        "client_id": str(client.id),
+                        "membership_id": str(membership.id)
+                    }
+                )
+
+                # Сохраняем данные из YooKassa
+                payment.transaction_id = yookassa_payment['payment_id']
+                payment.payment_url = yookassa_payment['confirmation_url']
+                payment.save()
+
+            except Exception as e:
+                # Если не удалось создать платёж в YooKassa - помечаем как FAILED
+                payment.status = PaymentStatus.FAILED
+                payment.notes += f"\nОшибка YooKassa: {str(e)}"
+                payment.save()
+                raise serializers.ValidationError(f"Ошибка создания платежа: {str(e)}")
 
         return payment
 

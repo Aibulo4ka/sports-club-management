@@ -155,7 +155,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         Проверить статус платежа
         GET /api/payments/{id}/status_check/
 
-        Проверяет статус в YooKassa (позже)
+        Проверяет статус в YooKassa и обновляет в БД
         """
         payment = self.get_object()
 
@@ -171,8 +171,37 @@ class PaymentViewSet(viewsets.ModelViewSet):
             except Client.DoesNotExist:
                 pass
 
-        # TODO: Здесь будет проверка статуса в YooKassa API
-        # Пока просто возвращаем текущий статус
+        # Проверяем статус в YooKassa (только для YOOKASSA платежей)
+        if payment.payment_method == 'YOOKASSA' and payment.transaction_id:
+            try:
+                from .yookassa_service import get_yookassa_service
+
+                yookassa = get_yookassa_service()
+                yookassa_status = yookassa.check_payment_status(payment.transaction_id)
+
+                # Обновляем статус если изменился
+                if yookassa_status['status'] == 'succeeded' and yookassa_status['paid']:
+                    if payment.status != PaymentStatus.COMPLETED:
+                        payment.status = PaymentStatus.COMPLETED
+                        payment.completed_at = timezone.now()
+
+                        # Активируем абонемент
+                        if payment.membership:
+                            from apps.memberships.models import MembershipStatus
+                            payment.membership.status = MembershipStatus.ACTIVE
+                            payment.membership.save()
+
+                        payment.save()
+
+                elif yookassa_status['status'] == 'canceled':
+                    payment.status = PaymentStatus.FAILED
+                    payment.save()
+
+            except Exception as e:
+                return Response(
+                    {'error': f'Ошибка проверки статуса: {str(e)}'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
         serializer = PaymentSerializer(payment)
         return Response(serializer.data)
@@ -184,15 +213,89 @@ class PaymentViewSet(viewsets.ModelViewSet):
         POST /api/payments/webhook/
 
         YooKassa отправляет сюда уведомления об изменении статуса платежа
-        """
-        # TODO: Реализовать обработку webhook от YooKassa
-        # 1. Проверить подпись запроса
-        # 2. Извлечь данные о платеже
-        # 3. Обновить статус в базе
-        # 4. Активировать абонемент если оплата успешна
-        # 5. Отправить уведомление клиенту через Observer pattern
 
-        return Response(
-            {'message': 'Webhook endpoint (будет реализован позже)'},
-            status=status.HTTP_200_OK
-        )
+        События:
+        - payment.waiting_for_capture - ожидает подтверждения
+        - payment.succeeded - успешно оплачен
+        - payment.canceled - отменён
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+
+        try:
+            from .yookassa_service import get_yookassa_service
+            from apps.memberships.models import MembershipStatus
+
+            # Обрабатываем webhook
+            yookassa = get_yookassa_service()
+            webhook_data = yookassa.process_webhook(request.data)
+
+            logger.info(f"Webhook received: {webhook_data}")
+
+            # Извлекаем metadata с нашим payment_id
+            metadata = webhook_data.get('metadata', {})
+            internal_payment_id = metadata.get('payment_id')
+
+            if not internal_payment_id:
+                logger.error("Webhook не содержит payment_id в metadata")
+                return Response(
+                    {'error': 'payment_id не найден в metadata'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Находим платёж в нашей БД
+            try:
+                payment = Payment.objects.select_related('membership', 'client__profile__user').get(
+                    id=internal_payment_id
+                )
+            except Payment.DoesNotExist:
+                logger.error(f"Payment {internal_payment_id} не найден в БД")
+                return Response(
+                    {'error': 'Платёж не найден'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Обновляем статус в зависимости от события
+            yookassa_status = webhook_data['status']
+            is_paid = webhook_data.get('paid', False)
+
+            with transaction.atomic():
+                if yookassa_status == 'succeeded' and is_paid:
+                    # Платёж успешно завершён
+                    payment.status = PaymentStatus.COMPLETED
+                    payment.completed_at = timezone.now()
+                    payment.notes += f"\n[Webhook] Оплачено {timezone.now()}"
+
+                    # Активируем абонемент
+                    if payment.membership:
+                        payment.membership.status = MembershipStatus.ACTIVE
+                        payment.membership.save()
+                        logger.info(f"Membership {payment.membership.id} activated")
+
+                    # TODO: Отправить уведомление клиенту через Observer pattern
+                    # from core.patterns.observer import PaymentSubject
+                    # payment_subject = PaymentSubject()
+                    # payment_subject.payment_completed(payment)
+
+                elif yookassa_status == 'canceled':
+                    # Платёж отменён
+                    payment.status = PaymentStatus.FAILED
+                    payment.notes += f"\n[Webhook] Отменён {timezone.now()}"
+
+                    # Отменяем абонемент
+                    if payment.membership:
+                        payment.membership.status = MembershipStatus.SUSPENDED
+                        payment.membership.save()
+
+                payment.save()
+
+            logger.info(f"Payment {payment.id} updated: status={payment.status}")
+
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Error processing webhook: {str(e)}", exc_info=True)
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
