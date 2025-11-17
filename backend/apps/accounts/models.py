@@ -123,3 +123,7 @@ class Trainer(models.Model):
 
     def __str__(self):
         return f"{self.profile.user.get_full_name()} - {self.specialization}"
+
+
+# Import AI-related models
+from .models_ai import WorkoutPlan, NutritionPlan, AIChat, FitnessGoal, FitnessLevel

@@ -3,7 +3,7 @@ Web URL configuration for accounts app (Django templates)
 """
 
 from django.urls import path
-from . import views_web
+from . import views_web, views_ai
 
 app_name = 'accounts_web'
 
@@ -22,4 +22,11 @@ urlpatterns = [
 
     # Trainers
     path('trainers/', views_web.trainers_list, name='trainers_list'),
+
+    # AI Trainer
+    path('ai-trainer/', views_ai.ai_trainer_home, name='ai_trainer_home'),
+    path('ai-trainer/generate-workout/', views_ai.generate_workout, name='generate_workout'),
+    path('ai-trainer/generate-nutrition/', views_ai.generate_nutrition, name='generate_nutrition'),
+    path('ai-trainer/workout/<int:plan_id>/', views_ai.view_workout_plan, name='view_workout_plan'),
+    path('ai-trainer/nutrition/<int:plan_id>/', views_ai.view_nutrition_plan, name='view_nutrition_plan'),
 ]
