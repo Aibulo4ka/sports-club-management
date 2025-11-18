@@ -96,11 +96,11 @@ def test_student_user():
             'phone': '+79991234568'
         }
     )
-    client, _ = Client.objects.get_or_create(
+    client, created = Client.objects.get_or_create(
         profile=profile,
         defaults={'is_student': True}
     )
-    # Явно обновляем is_student=True даже если клиент уже существовал
+    # Всегда устанавливаем is_student=True для этой фикстуры
     if not client.is_student:
         client.is_student = True
         client.save()

@@ -5,8 +5,10 @@ Views для аналитики и dashboard
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Sum, Avg
+from django.db.models.functions import TruncDate
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
+import json
 
 from apps.accounts.models import Client, Trainer
 from apps.memberships.models import Membership, MembershipStatus
@@ -101,6 +103,58 @@ def dashboard(request):
         current_capacity=Count('bookings', filter=Q(bookings__status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]))
     ).order_by('datetime')[:5]
 
+    # Данные для графика выручки по дням (последние 30 дней)
+    revenue_by_day = Payment.objects.filter(
+        status=PaymentStatus.COMPLETED,
+        completed_at__gte=last_30_days
+    ).annotate(
+        day=TruncDate('completed_at')
+    ).values('day').annotate(
+        total=Sum('amount')
+    ).order_by('day')
+
+    # Заполняем все дни (даже если нет данных)
+    revenue_chart_labels = []
+    revenue_chart_data = []
+    revenue_dict = {item['day']: float(item['total']) for item in revenue_by_day}
+
+    for i in range(30):
+        day = (timezone.now() - timedelta(days=29-i)).date()
+        revenue_chart_labels.append(day.strftime('%d.%m'))
+        revenue_chart_data.append(revenue_dict.get(day, 0))
+
+    # Данные для графика новых клиентов по дням
+    clients_by_day = Client.objects.filter(
+        profile__created_at__gte=last_30_days
+    ).annotate(
+        day=TruncDate('profile__created_at')
+    ).values('day').annotate(
+        count=Count('id')
+    ).order_by('day')
+
+    clients_chart_data = []
+    clients_dict = {item['day']: item['count'] for item in clients_by_day}
+
+    for i in range(30):
+        day = (timezone.now() - timedelta(days=29-i)).date()
+        clients_chart_data.append(clients_dict.get(day, 0))
+
+    # Данные для графика бронирований по дням
+    bookings_by_day = Booking.objects.filter(
+        booking_date__gte=last_30_days
+    ).annotate(
+        day=TruncDate('booking_date')
+    ).values('day').annotate(
+        count=Count('id')
+    ).order_by('day')
+
+    bookings_chart_data = []
+    bookings_dict = {item['day']: item['count'] for item in bookings_by_day}
+
+    for i in range(30):
+        day = (timezone.now() - timedelta(days=29-i)).date()
+        bookings_chart_data.append(bookings_dict.get(day, 0))
+
     context = {
         # Основные метрики
         'total_clients': total_clients,
@@ -125,6 +179,12 @@ def dashboard(request):
         # Последние данные
         'recent_payments': recent_payments,
         'upcoming_classes': upcoming_classes,
+
+        # Данные для графиков (преобразуем в JSON для JavaScript)
+        'revenue_chart_labels': json.dumps(revenue_chart_labels),
+        'revenue_chart_data': json.dumps(revenue_chart_data),
+        'clients_chart_data': json.dumps(clients_chart_data),
+        'bookings_chart_data': json.dumps(bookings_chart_data),
     }
 
     return render(request, 'analytics/dashboard.html', context)

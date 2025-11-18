@@ -22,6 +22,8 @@ urlpatterns = [
 
     # Trainers
     path('trainers/', views_web.trainers_list, name='trainers_list'),
+    path('trainer/dashboard/', views_web.trainer_dashboard, name='trainer_dashboard'),
+    path('trainer/class/<int:class_id>/', views_web.trainer_class_detail, name='trainer_class_detail'),
 
     # AI Trainer
     path('ai-trainer/', views_ai.ai_trainer_home, name='ai_trainer_home'),

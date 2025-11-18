@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Кабинет тренера - АС УСК{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5" style="color: var(--text-light); font-weight: 900;">
+                <i class="bi bi-person-workspace"></i> Личный кабинет тренера
+            </h1>
+            <p style="color: var(--text-muted);">{{ trainer.profile.user.get_full_name }} - {{ trainer.specialization }}</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 15px;">
+                <div class="card-body">
+                    <h6 style="color: var(--text-muted); text-transform: uppercase; font-weight: 600; font-size: 0.9rem;">Всего занятий</h6>
+                    <h2 style="color: var(--text-light); font-weight: 900;">{{ total_classes }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card" style="background: linear-gradient(135deg, rgba(0, 217, 165, 0.1) 0%, rgba(0, 217, 165, 0.1) 100%); border: 1px solid rgba(0, 217, 165, 0.3); border-radius: 15px;">
+                <div class="card-body">
+                    <h6 style="color: var(--text-muted); text-transform: uppercase; font-weight: 600; font-size: 0.9rem;">Предстоящих</h6>
+                    <h2 style="color: var(--text-light); font-weight: 900;">{{ upcoming_count }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 147, 30, 0.1) 100%); border: 1px solid rgba(255, 107, 53, 0.3); border-radius: 15px;">
+                <div class="card-body">
+                    <h6 style="color: var(--text-muted); text-transform: uppercase; font-weight: 600; font-size: 0.9rem;">Уник. клиентов (30д)</h6>
+                    <h2 style="color: var(--text-light); font-weight: 900;">{{ unique_clients }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card" style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 15px;">
+                <div class="card-body">
+                    <h6 style="color: var(--text-muted); text-transform: uppercase; font-weight: 600; font-size: 0.9rem;">Опыт работы</h6>
+                    <h2 style="color: var(--text-light); font-weight: 900;">{{ trainer.experience_years }} лет</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Upcoming Classes -->
+        <div class="col-lg-8">
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">
+                        <i class="bi bi-calendar-week"></i> Предстоящие занятия (7 дней)
+                    </h5>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    {% if upcoming_classes %}
+                        {% for class in upcoming_classes %}
+                        <div class="mb-3 p-3" style="background: rgba(255, 107, 53, 0.05); border-radius: 10px; border-left: 3px solid var(--primary-color);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" style="color: var(--text-light); font-weight: 600;">{{ class.class_type.name }}</h6>
+                                    <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                                        <i class="bi bi-clock"></i> {{ class.datetime|date:"d.m.Y (l) H:i" }}<br>
+                                        <i class="bi bi-geo-alt"></i> {{ class.room.name }}<br>
+                                        <i class="bi bi-people"></i> Записано: {{ class.booked_count }}/{{ class.max_capacity }}
+                                    </p>
+                                </div>
+                                <a href="{% url 'accounts_web:trainer_class_detail' class.id %}"
+                                   class="btn btn-sm"
+                                   style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none;">
+                                    Подробнее
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--text-muted); text-align: center; padding: 3rem 0;">
+                            Нет предстоящих занятий на ближайшие 7 дней
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Class Details -->
+        <div class="col-lg-4">
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">
+                        <i class="bi bi-alarm"></i> Ближайшее занятие
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if next_class %}
+                        <div class="mb-3">
+                            <h6 style="color: var(--text-light); font-weight: 600;">{{ next_class.class_type.name }}</h6>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                                <i class="bi bi-clock"></i> {{ next_class.datetime|date:"d.m.Y H:i" }}<br>
+                                <i class="bi bi-geo-alt"></i> {{ next_class.room.name }}<br>
+                                <i class="bi bi-people"></i> {{ next_class.booked_count }}/{{ next_class.max_capacity }} мест
+                            </p>
+                        </div>
+
+                        {% if next_class_clients %}
+                            <h6 style="color: var(--text-light); margin-top: 1.5rem;">Список клиентов:</h6>
+                            <div class="list-group" style="max-height: 300px; overflow-y: auto;">
+                                {% for booking in next_class_clients %}
+                                <div class="list-group-item" style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-light); margin-bottom: 0.5rem; border-radius: 8px;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-circle" style="font-size: 1.5rem; color: var(--primary-color); margin-right: 0.75rem;"></i>
+                                        <div class="flex-grow-1">
+                                            <strong>{{ booking.client.profile.user.get_full_name }}</strong><br>
+                                            <small style="color: var(--text-muted);">{{ booking.client.profile.phone }}</small>
+                                        </div>
+                                        {% if booking.status == 'COMPLETED' %}
+                                            <span class="badge bg-success">Был</span>
+                                        {% elif booking.status == 'CONFIRMED' %}
+                                            <span class="badge bg-info">Ожидается</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Нет записавшихся клиентов</p>
+                        {% endif %}
+
+                        <a href="{% url 'accounts_web:trainer_class_detail' next_class.id %}"
+                           class="btn w-100 mt-3"
+                           style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none;">
+                            Отметить посещения
+                        </a>
+                    {% else %}
+                        <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                            Нет предстоящих занятий
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Past Classes -->
+    {% if past_classes %}
+    <div class="row g-4 mt-1">
+        <div class="col-12">
+            <div class="card" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">
+                        <i class="bi bi-clock-history"></i> Прошедшие занятия
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" style="color: var(--text-light);">
+                            <thead style="border-bottom: 2px solid rgba(255, 107, 53, 0.3);">
+                                <tr>
+                                    <th style="color: var(--text-muted); border: none;">Дата</th>
+                                    <th style="color: var(--text-muted); border: none;">Занятие</th>
+                                    <th style="color: var(--text-muted); border: none;">Зал</th>
+                                    <th style="color: var(--text-muted); border: none;">Посещаемость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for class in past_classes %}
+                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                    <td style="border: none;">{{ class.datetime|date:"d.m.Y H:i" }}</td>
+                                    <td style="border: none;">{{ class.class_type.name }}</td>
+                                    <td style="border: none;">{{ class.room.name }}</td>
+                                    <td style="border: none;">
+                                        <span class="badge" style="background: rgba(0, 217, 165, 0.2); color: var(--success-color); border: 1px solid var(--success-color);">
+                                            {{ class.booked_count }}/{{ class.max_capacity }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+{% endblock %}

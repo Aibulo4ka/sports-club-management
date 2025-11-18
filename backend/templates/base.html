@@ -254,12 +254,21 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts_web:trainers_list' %}">Тренеры</a>
                     </li>
-                    {% if user.is_authenticated and not user.is_staff %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts_web:ai_trainer_home' %}">
-                                <i class="bi bi-robot"></i> AI Тренер
-                            </a>
-                        </li>
+                    {% if user.is_authenticated %}
+                        {% if user.profile.role == 'TRAINER' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts_web:trainer_dashboard' %}">
+                                    <i class="bi bi-person-workspace"></i> Мой кабинет
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if not user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts_web:ai_trainer_home' %}">
+                                    <i class="bi bi-robot"></i> AI Тренер
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
@@ -270,9 +279,13 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'accounts_web:profile' %}">Профиль</a></li>
-                                <li><a class="dropdown-item" href="{% url 'memberships_web:my_memberships' %}">Мои абонементы</a></li>
-                                <li><a class="dropdown-item" href="{% url 'bookings_web:my_bookings' %}">Мои бронирования</a></li>
-                                <li><a class="dropdown-item" href="{% url 'payments_web:my_payments' %}">История платежей</a></li>
+                                {% if user.profile.role == 'TRAINER' %}
+                                    <li><a class="dropdown-item" href="{% url 'accounts_web:trainer_dashboard' %}">Кабинет тренера</a></li>
+                                {% elif user.profile.role == 'CLIENT' %}
+                                    <li><a class="dropdown-item" href="{% url 'memberships_web:my_memberships' %}">Мои абонементы</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'bookings_web:my_bookings' %}">Мои бронирования</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'payments_web:my_payments' %}">История платежей</a></li>
+                                {% endif %}
                                 {% if user.is_staff %}
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'analytics:dashboard' %}">Dashboard</a></li>

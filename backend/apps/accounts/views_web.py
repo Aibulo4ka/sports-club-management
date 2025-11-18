@@ -212,3 +212,182 @@ def trainers_list(request):
     return render(request, 'accounts/trainers_list.html', {
         'trainers': trainers
     })
+
+
+@login_required
+def trainer_dashboard(request):
+    """
+    Личный кабинет тренера
+    - Расписание занятий
+    - Список клиентов на занятиях
+    - Отметка посещений
+    """
+    from .models import Trainer, UserRole
+    from apps.classes.models import Class
+    from apps.bookings.models import Booking, BookingStatus
+    from django.db.models import Count, Q
+    from django.utils import timezone
+    from datetime import timedelta
+
+    # Проверяем, что пользователь - тренер
+    if not hasattr(request.user, 'profile') or request.user.profile.role != UserRole.TRAINER:
+        messages.error(request, 'Доступ запрещён. Эта страница только для тренеров.')
+        return redirect('accounts_web:home')
+
+    try:
+        trainer = request.user.profile.trainer_info
+    except Trainer.DoesNotExist:
+        messages.error(request, 'Профиль тренера не найден')
+        return redirect('accounts_web:home')
+
+    # Получаем занятия тренера
+    now = timezone.now()
+
+    # Предстоящие занятия (следующие 7 дней)
+    upcoming_classes = Class.objects.filter(
+        trainer=trainer,
+        datetime__gte=now,
+        datetime__lte=now + timedelta(days=7)
+    ).select_related(
+        'class_type',
+        'room'
+    ).annotate(
+        booked_count=Count('bookings', filter=Q(bookings__status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]))
+    ).order_by('datetime')
+
+    # Прошедшие занятия (последние 7 дней)
+    past_classes = Class.objects.filter(
+        trainer=trainer,
+        datetime__lt=now,
+        datetime__gte=now - timedelta(days=7)
+    ).select_related(
+        'class_type',
+        'room'
+    ).annotate(
+        booked_count=Count('bookings', filter=Q(bookings__status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]))
+    ).order_by('-datetime')[:10]
+
+    # Статистика
+    total_classes = Class.objects.filter(trainer=trainer).count()
+    upcoming_count = upcoming_classes.count()
+
+    # Клиенты на ближайшем занятии
+    next_class = upcoming_classes.first()
+    next_class_clients = None
+    if next_class:
+        next_class_clients = Booking.objects.filter(
+            class_instance=next_class,
+            status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]
+        ).select_related(
+            'client__profile__user'
+        ).order_by('booking_date')
+
+    # Уникальные клиенты тренера (за последние 30 дней)
+    unique_clients = Booking.objects.filter(
+        class_instance__trainer=trainer,
+        class_instance__datetime__gte=now - timedelta(days=30),
+        status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]
+    ).values('client').distinct().count()
+
+    context = {
+        'trainer': trainer,
+        'upcoming_classes': upcoming_classes,
+        'past_classes': past_classes,
+        'total_classes': total_classes,
+        'upcoming_count': upcoming_count,
+        'unique_clients': unique_clients,
+        'next_class': next_class,
+        'next_class_clients': next_class_clients,
+    }
+
+    return render(request, 'accounts/trainer_dashboard.html', context)
+
+
+@login_required
+def trainer_class_detail(request, class_id):
+    """
+    Детали занятия для тренера с возможностью отметки посещений
+    """
+    from .models import Trainer, UserRole
+    from apps.classes.models import Class
+    from apps.bookings.models import Booking, BookingStatus, Visit
+    from django.shortcuts import get_object_or_404
+
+    # Проверяем, что пользователь - тренер
+    if not hasattr(request.user, 'profile') or request.user.profile.role != UserRole.TRAINER:
+        messages.error(request, 'Доступ запрещён')
+        return redirect('accounts_web:home')
+
+    try:
+        trainer = request.user.profile.trainer_info
+    except Trainer.DoesNotExist:
+        messages.error(request, 'Профиль тренера не найден')
+        return redirect('accounts_web:home')
+
+    # Получаем занятие
+    class_instance = get_object_or_404(Class, id=class_id, trainer=trainer)
+
+    # Обработка отметки посещения
+    if request.method == 'POST':
+        booking_id = request.POST.get('booking_id')
+        action = request.POST.get('action')
+
+        if booking_id and action:
+            try:
+                booking = Booking.objects.get(id=booking_id, class_instance=class_instance)
+
+                if action == 'mark_completed':
+                    # Отмечаем посещение
+                    booking.status = BookingStatus.COMPLETED
+                    booking.save()
+
+                    # Создаём запись о посещении, если её нет
+                    Visit.objects.get_or_create(
+                        booking=booking,
+                        defaults={'checked_by': request.user}
+                    )
+
+                    # Уменьшаем счётчик посещений в абонементе
+                    if booking.client.memberships.filter(status='ACTIVE').exists():
+                        active_membership = booking.client.memberships.filter(status='ACTIVE').first()
+                        if active_membership.visits_remaining is not None and active_membership.visits_remaining > 0:
+                            active_membership.visits_remaining -= 1
+                            active_membership.save()
+
+                    messages.success(request, f'Посещение отмечено для {booking.client.profile.user.get_full_name()}')
+
+                elif action == 'mark_no_show':
+                    # Отмечаем неявку
+                    booking.status = BookingStatus.NO_SHOW
+                    booking.save()
+                    messages.warning(request, f'Отмечена неявка для {booking.client.profile.user.get_full_name()}')
+
+            except Booking.DoesNotExist:
+                messages.error(request, 'Бронирование не найдено')
+            except Exception as e:
+                messages.error(request, f'Ошибка: {str(e)}')
+
+            return redirect('accounts_web:trainer_class_detail', class_id=class_id)
+
+    # Получаем всех клиентов на занятии
+    bookings = Booking.objects.filter(
+        class_instance=class_instance
+    ).select_related(
+        'client__profile__user'
+    ).prefetch_related(
+        'visit'
+    ).order_by('status', 'booking_date')
+
+    # Подсчитываем только активные бронирования (CONFIRMED и COMPLETED)
+    active_bookings_count = bookings.filter(
+        status__in=[BookingStatus.CONFIRMED, BookingStatus.COMPLETED]
+    ).count()
+
+    context = {
+        'class_instance': class_instance,
+        'bookings': bookings,
+        'active_bookings_count': active_bookings_count,
+        'trainer': trainer,
+    }
+
+    return render(request, 'accounts/trainer_class_detail.html', context)

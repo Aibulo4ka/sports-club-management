@@ -85,6 +85,37 @@
         </div>
     </div>
 
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Revenue Chart -->
+        <div class="col-lg-8">
+            <div class="card h-100" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">
+                        <i class="bi bi-graph-up"></i> Выручка за последние 30 дней
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients & Bookings Chart -->
+        <div class="col-lg-4">
+            <div class="card h-100" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h5 class="mb-0" style="color: var(--text-light); font-weight: 700;">
+                        <i class="bi bi-activity"></i> Активность
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="activityChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts and Stats Row -->
     <div class="row g-4 mb-4">
         <!-- Popular Classes -->
@@ -230,4 +261,196 @@
 </div>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Общие настройки для всех графиков
+    Chart.defaults.color = '#9BA3B4';
+    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+    // График выручки
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        const gradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(255, 107, 53, 0.3)');
+        gradient.addColorStop(1, 'rgba(247, 147, 30, 0.01)');
+
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: {{ revenue_chart_labels|safe }},
+                datasets: [{
+                    label: 'Выручка (₽)',
+                    data: {{ revenue_chart_data|safe }},
+                    borderColor: '#FF6B35',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#FF6B35',
+                    pointBorderColor: '#1a1d29',
+                    pointBorderWidth: 2,
+                    pointHoverBackgroundColor: '#F7931E',
+                    pointHoverBorderColor: '#FF6B35',
+                    pointHoverBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9BA3B4',
+                        borderColor: 'rgba(255, 107, 53, 0.5)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Выручка: ' + context.parsed.y.toLocaleString('ru-RU') + ' ₽';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#9BA3B4',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#9BA3B4',
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString('ru-RU') + ' ₽';
+                            }
+                        },
+                        beginAtZero: true
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
+
+    // График активности (клиенты и бронирования)
+    const activityCtx = document.getElementById('activityChart');
+    if (activityCtx) {
+        new Chart(activityCtx, {
+            type: 'line',
+            data: {
+                labels: {{ revenue_chart_labels|safe }},
+                datasets: [
+                    {
+                        label: 'Новые клиенты',
+                        data: {{ clients_chart_data|safe }},
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#1a1d29',
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: 'Бронирования',
+                        data: {{ bookings_chart_data|safe }},
+                        borderColor: '#00d9a5',
+                        backgroundColor: 'rgba(0, 217, 165, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#00d9a5',
+                        pointBorderColor: '#1a1d29',
+                        pointBorderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9BA3B4',
+                            usePointStyle: true,
+                            padding: 15,
+                            font: {
+                                size: 11,
+                                weight: '600'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9BA3B4',
+                        borderColor: 'rgba(255, 107, 53, 0.5)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        usePointStyle: true
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#9BA3B4',
+                            font: {
+                                size: 10
+                            },
+                            stepSize: 1
+                        },
+                        beginAtZero: true
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
