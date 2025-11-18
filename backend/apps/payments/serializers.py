@@ -101,7 +101,7 @@ class PaymentCreateSerializer(serializers.Serializer):
         from apps.memberships.models import MembershipType, Membership
         from apps.memberships.pricing import PriceCalculator, get_best_discount_strategy
         from datetime import timedelta
-        from .yookassa_service import get_yookassa_service
+        from .payment_service_factory import get_payment_service
         from django.conf import settings
 
         client = self.context['client']
@@ -146,10 +146,10 @@ class PaymentCreateSerializer(serializers.Serializer):
             notes=f"Скидка применена: {price_info['discount_description']}"
         )
 
-        # Интеграция с YooKassa (только для YOOKASSA метода)
+        # Интеграция с платёжной системой (YooKassa или mock для демо)
         if validated_data['payment_method'] == PaymentMethod.YOOKASSA:
             try:
-                yookassa = get_yookassa_service()
+                payment_service = get_payment_service()
 
                 # Формируем return_url (куда вернуть клиента после оплаты)
                 if request:
@@ -157,10 +157,10 @@ class PaymentCreateSerializer(serializers.Serializer):
                 else:
                     base_url = settings.ALLOWED_HOSTS[0]
 
-                return_url = f"{base_url}/payments/success/?payment_id={payment.id}"
+                return_url = f"{base_url}/payments/success/{payment.id}/"
 
-                # Создаём платёж в YooKassa
-                yookassa_payment = yookassa.create_payment(
+                # Создаём платёж в платёжной системе (YooKassa или mock)
+                yookassa_payment = payment_service.create_payment(
                     amount=final_price,
                     description=f"Абонемент {membership_type.name}",
                     client_email=client.profile.user.email,

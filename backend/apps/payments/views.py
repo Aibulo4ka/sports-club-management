@@ -171,13 +171,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
             except Client.DoesNotExist:
                 pass
 
-        # Проверяем статус в YooKassa (только для YOOKASSA платежей)
+        # Проверяем статус в платёжной системе (YooKassa или mock)
         if payment.payment_method == 'YOOKASSA' and payment.transaction_id:
             try:
-                from .yookassa_service import get_yookassa_service
+                from .payment_service_factory import get_payment_service
 
-                yookassa = get_yookassa_service()
-                yookassa_status = yookassa.check_payment_status(payment.transaction_id)
+                payment_service = get_payment_service()
+                yookassa_status = payment_service.check_payment_status(payment.transaction_id)
 
                 # Обновляем статус если изменился
                 if yookassa_status['status'] == 'succeeded' and yookassa_status['paid']:
@@ -223,12 +223,12 @@ class PaymentViewSet(viewsets.ModelViewSet):
         logger = logging.getLogger(__name__)
 
         try:
-            from .yookassa_service import get_yookassa_service
+            from .payment_service_factory import get_payment_service
             from apps.memberships.models import MembershipStatus
 
-            # Обрабатываем webhook
-            yookassa = get_yookassa_service()
-            webhook_data = yookassa.process_webhook(request.data)
+            # Обрабатываем webhook (YooKassa или mock)
+            payment_service = get_payment_service()
+            webhook_data = payment_service.process_webhook(request.data)
 
             logger.info(f"Webhook received: {webhook_data}")
 

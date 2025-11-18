@@ -34,6 +34,16 @@ app.conf.beat_schedule = {
         'task': 'apps.memberships.tasks.cleanup_expired_memberships',
         'schedule': crontab(hour=2, minute=0),  # 2 AM every day
     },
+    # Send membership expiry reminders (3 days before expiration)
+    'send-membership-expiry-reminders': {
+        'task': 'apps.memberships.tasks.send_membership_expiry_reminders',
+        'schedule': crontab(hour=9, minute=0),  # 9 AM every day
+    },
+    # Deactivate expired memberships
+    'deactivate-expired-memberships': {
+        'task': 'apps.memberships.tasks.deactivate_expired_memberships',
+        'schedule': crontab(hour=1, minute=0),  # 1 AM every day
+    },
 }
 
 @app.task(bind=True)

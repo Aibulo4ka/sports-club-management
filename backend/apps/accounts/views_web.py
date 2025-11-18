@@ -100,6 +100,10 @@ def register_view(request):
                 # Create client
                 Client.objects.create(profile=profile)
 
+            # Send welcome email асинхронно
+            from .tasks import send_welcome_email
+            send_welcome_email.delay(user.id)
+
             # Log the user in
             login(request, user)
             messages.success(request, f'Добро пожаловать, {user.get_full_name() or user.username}! Ваш аккаунт успешно создан.')

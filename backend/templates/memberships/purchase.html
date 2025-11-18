@@ -26,26 +26,26 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Детали заказа</h4>
+            <div class="card shadow-lg" style="background: var(--dark-card); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 15px;">
+                <div class="card-header" style="background: rgba(255, 107, 53, 0.15); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">
+                    <h4 class="mb-0" style="color: var(--text-light); font-weight: 700;">Детали заказа</h4>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4" style="color: var(--text-light);">
                     <!-- Membership Details -->
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <h5 class="text-primary">{{ membership_type.name }}</h5>
+                            <h5 style="color: var(--primary-color); font-weight: 700;">{{ membership_type.name }}</h5>
                             {% if membership_type.description %}
-                                <p class="text-muted">{{ membership_type.description }}</p>
+                                <p style="color: var(--text-muted);">{{ membership_type.description }}</p>
                             {% endif %}
                         </div>
                         <div class="col-md-6 text-md-end">
                             <dl>
-                                <dt class="text-muted">Длительность:</dt>
-                                <dd><strong>{{ membership_type.duration_days }}</strong> дней</dd>
+                                <dt style="color: var(--text-muted);">Длительность:</dt>
+                                <dd style="color: var(--text-light);"><strong>{{ membership_type.duration_days }}</strong> дней</dd>
 
-                                <dt class="text-muted">Посещения:</dt>
-                                <dd>
+                                <dt style="color: var(--text-muted);">Посещения:</dt>
+                                <dd style="color: var(--text-light);">
                                     {% if membership_type.visits_limit %}
                                         <strong>{{ membership_type.visits_limit }}</strong> посещений
                                     {% else %}
@@ -56,40 +56,40 @@
                         </div>
                     </div>
 
-                    <hr>
+                    <hr style="border-color: rgba(255, 255, 255, 0.1);">
 
                     <!-- Client Info -->
                     <div class="mb-4">
-                        <h5>Клиент</h5>
-                        <p class="mb-1">
+                        <h5 style="color: var(--text-light); font-weight: 700;">Клиент</h5>
+                        <p class="mb-1" style="color: var(--text-light);">
                             <strong>{{ user.get_full_name|default:user.username }}</strong>
                         </p>
-                        <p class="text-muted mb-1">
+                        <p class="mb-1" style="color: var(--text-muted);">
                             <i class="bi bi-envelope"></i> {{ user.email }}
                         </p>
-                        <p class="text-muted">
+                        <p style="color: var(--text-muted);">
                             <i class="bi bi-telephone"></i> {{ client.profile.phone }}
                         </p>
 
                         {% if client.is_student %}
-                            <span class="badge bg-success">
+                            <span class="badge" style="background: var(--success-color); color: white;">
                                 <i class="bi bi-mortarboard"></i> Студент
                             </span>
                         {% endif %}
                     </div>
 
-                    <hr>
+                    <hr style="border-color: rgba(255, 255, 255, 0.1);">
 
                     <!-- Price Breakdown -->
                     <div class="mb-4">
-                        <h5>Расчёт стоимости</h5>
+                        <h5 style="color: var(--text-light); font-weight: 700;">Расчёт стоимости</h5>
 
                         <div class="row">
                             <div class="col-6">
-                                <p class="text-muted">Базовая цена:</p>
+                                <p style="color: var(--text-muted);">Базовая цена:</p>
                             </div>
                             <div class="col-6 text-end">
-                                <p>
+                                <p style="color: var(--text-light);">
                                     {% if price_info.discount_amount != '0.00' %}
                                         <s>{{ price_info.base_price }} ₽</s>
                                     {% else %}
@@ -102,33 +102,33 @@
                         {% if price_info.discount_amount != '0.00' %}
                             <div class="row">
                                 <div class="col-6">
-                                    <p class="text-success">
+                                    <p style="color: var(--success-color);">
                                         <i class="bi bi-tag"></i> Скидка ({{ price_info.discount_percentage }}%):
                                     </p>
                                 </div>
                                 <div class="col-6 text-end">
-                                    <p class="text-success">-{{ price_info.discount_amount }} ₽</p>
+                                    <p style="color: var(--success-color);">-{{ price_info.discount_amount }} ₽</p>
                                 </div>
                             </div>
 
-                            <div class="alert alert-success mb-0">
-                                <i class="bi bi-check-circle"></i> {{ price_info.discount_description }}
+                            <div class="alert mb-0" style="background: rgba(0, 217, 165, 0.1); border: 1px solid rgba(0, 217, 165, 0.3); border-radius: 10px; color: var(--text-light);">
+                                <i class="bi bi-check-circle" style="color: var(--success-color);"></i> {{ price_info.discount_description }}
                             </div>
                         {% endif %}
 
-                        <hr>
+                        <hr style="border-color: rgba(255, 255, 255, 0.1);">
 
                         <div class="row">
                             <div class="col-6">
-                                <h4>Итого к оплате:</h4>
+                                <h4 style="color: var(--text-light);">Итого к оплате:</h4>
                             </div>
                             <div class="col-6 text-end">
-                                <h3 class="text-primary mb-0">{{ price_info.final_price }} ₽</h3>
+                                <h3 class="mb-0" style="color: var(--primary-color); font-weight: 900;">{{ price_info.final_price }} ₽</h3>
                             </div>
                         </div>
                     </div>
 
-                    <hr>
+                    <hr style="border-color: rgba(255, 255, 255, 0.1);">
 
                     <!-- Purchase Form -->
                     <form method="post" action="{% url 'memberships_web:purchase' membership_type.id %}">
@@ -153,10 +153,10 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 10px; font-weight: 700;">
                                 <i class="bi bi-check-circle"></i> Подтвердить покупку
                             </button>
-                            <a href="{% url 'memberships_web:catalog' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'memberships_web:catalog' %}" class="btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); border-radius: 10px; font-weight: 600;">
                                 <i class="bi bi-arrow-left"></i> Назад к каталогу
                             </a>
                         </div>
@@ -165,13 +165,13 @@
             </div>
 
             <!-- Info Alert -->
-            <div class="alert alert-info mt-4">
-                <h5><i class="bi bi-info-circle"></i> Информация</h5>
-                <ul class="mb-0">
+            <div class="alert mt-4" style="background: rgba(0, 123, 255, 0.1); border: 1px solid rgba(0, 123, 255, 0.3); border-radius: 15px; color: var(--text-light);">
+                <h5 style="color: #66b3ff;"><i class="bi bi-info-circle"></i> Информация</h5>
+                <ul class="mb-0" style="color: var(--text-light);">
                     <li>Абонемент активируется сразу после подтверждения покупки</li>
                     <li>Вы сможете начать бронировать занятия сразу после активации</li>
-                    <li>Онлайн-оплата будет доступна в следующей версии (Sprint 5)</li>
-                    <li>Сейчас оплата производится в клубе при получении абонемента</li>
+                    <li>Онлайн-оплата доступна через YooKassa (демо-режим)</li>
+                    <li>Платёж будет обработан автоматически</li>
                 </ul>
             </div>
         </div>

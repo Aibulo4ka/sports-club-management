@@ -80,3 +80,12 @@ AUTH_PASSWORD_VALIDATORS = []
 # Logging - more verbose in development
 LOGGING['root']['level'] = 'DEBUG'
 LOGGING['loggers']['django']['level'] = 'DEBUG'
+
+# ============================================================================
+# PAYMENT SETTINGS - Development
+# ============================================================================
+
+# Использовать mock-заглушку вместо реальной YooKassa
+# True = демо-режим (для курсовой/презентации)
+# False = реальные платежи через YooKassa
+USE_MOCK_PAYMENTS = config('USE_MOCK_PAYMENTS', default=True, cast=bool)
