@@ -16,25 +16,25 @@ from django.utils import timezone
 
 # Интерфейс стратегии
 class DiscountStrategy(ABC):
-    """Abstract strategy for calculating discounts"""
+    """Абстрактная стратегия для расчета скидок"""
 
     @abstractmethod
     def calculate_discount(self, base_price: Decimal, user: User) -> Decimal:
         """
-        Calculate discount amount for given price and user
-        Returns: discount amount (not percentage)
+        Рассчитать сумму скидки для заданной цены и пользователя
+        Возвращает: сумму скидки (не процент)
         """
         pass
 
     @abstractmethod
     def get_description(self) -> str:
-        """Get description of this discount"""
+        """Получить описание этой скидки"""
         pass
 
 
 # Конкретные стратегии
 class StudentDiscount(DiscountStrategy):
-    """20% discount for students"""
+    """Скидка 20% для студентов"""
 
     def calculate_discount(self, base_price: Decimal, user: User) -> Decimal:
         # Проверяем, является ли пользователь студентом
@@ -48,7 +48,7 @@ class StudentDiscount(DiscountStrategy):
 
 
 class GroupDiscount(DiscountStrategy):
-    """15% discount for group members (3+ people)"""
+    """Скидка 15% для групповых занятий (от 3 человек)"""
 
     def calculate_discount(self, base_price: Decimal, user: User) -> Decimal:
         # Скидка для групповых занятий
@@ -63,7 +63,7 @@ class GroupDiscount(DiscountStrategy):
 
 
 class LoyaltyDiscount(DiscountStrategy):
-    """10% discount for clients registered > 1 year"""
+    """Скидка 10% для клиентов, зарегистрированных более года"""
 
     def calculate_discount(self, base_price: Decimal, user: User) -> Decimal:
         # Скидка за лояльность
@@ -77,7 +77,7 @@ class LoyaltyDiscount(DiscountStrategy):
 
 
 class NoDiscount(DiscountStrategy):
-    """No discount"""
+    """Без скидки"""
 
     def calculate_discount(self, base_price: Decimal, user: User) -> Decimal:
         return Decimal('0')
@@ -89,20 +89,20 @@ class NoDiscount(DiscountStrategy):
 # Контекст
 class PriceCalculator:
     """
-    Context class for calculating prices with discounts
+    Класс-контекст для расчета цен со скидками
     """
 
     def __init__(self):
         self._strategy: Optional[DiscountStrategy] = None
 
     def set_strategy(self, strategy: DiscountStrategy) -> None:
-        """Set discount strategy"""
+        """Установить стратегию скидки"""
         self._strategy = strategy
 
     def calculate_final_price(self, base_price: Decimal, user: User) -> tuple[Decimal, Decimal, str]:
         """
-        Calculate final price after applying discount
-        Returns: (final_price, discount_amount, discount_description)
+        Рассчитать финальную цену после применения скидки
+        Возвращает: (финальная_цена, сумма_скидки, описание_скидки)
         """
         if not self._strategy:
             self._strategy = NoDiscount()
@@ -115,8 +115,8 @@ class PriceCalculator:
 
     def get_best_discount(self, base_price: Decimal, user: User) -> tuple[Decimal, Decimal, str]:
         """
-        Find and apply the best discount for the user
-        Returns: (final_price, discount_amount, discount_description)
+        Найти и применить лучшую скидку для пользователя
+        Возвращает: (финальная_цена, сумма_скидки, описание_скидки)
         """
         strategies = [
             StudentDiscount(),

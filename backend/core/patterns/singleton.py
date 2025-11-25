@@ -13,7 +13,7 @@ from typing import Optional, Any
 
 class CacheManager:
     """
-    Thread-safe Singleton for managing application cache
+    Потокобезопасный Singleton для управления кешем приложения
     """
     _instance: Optional['CacheManager'] = None
     _lock = threading.Lock()
@@ -36,25 +36,25 @@ class CacheManager:
         self._default_timeout = 300  # 5 минут
 
     def get(self, key: str) -> Any:
-        """Get value from cache"""
+        """Получить значение из кеша"""
         return cache.get(f"{self._cache_prefix}{key}")
 
     def set(self, key: str, value: Any, timeout: int = None) -> None:
-        """Set value in cache"""
+        """Установить значение в кеш"""
         timeout = timeout or self._default_timeout
         cache.set(f"{self._cache_prefix}{key}", value, timeout)
 
     def delete(self, key: str) -> None:
-        """Delete value from cache"""
+        """Удалить значение из кеша"""
         cache.delete(f"{self._cache_prefix}{key}")
 
     def clear_pattern(self, pattern: str) -> None:
-        """Clear all keys matching pattern"""
-        # Redis-specific: delete all keys with pattern
+        """Очистить все ключи, соответствующие шаблону"""
+        # Специфично для Redis: удаление всех ключей по шаблону
         from django.core.cache import cache as django_cache
         if hasattr(django_cache, 'delete_pattern'):
             django_cache.delete_pattern(f"{self._cache_prefix}{pattern}*")
 
 
-# Global cache manager instance
+# Глобальный экземпляр менеджера кеша
 cache_manager = CacheManager()

@@ -13,17 +13,17 @@ from django.db.models import Q
 
 
 class ClassConflictError(Exception):
-    """Exception raised when there's a scheduling conflict"""
+    """Исключение, возникающее при конфликте в расписании"""
     pass
 
 
 class ClassFactory:
     """
-    Factory for creating different types of classes with default settings
-    Uses Factory pattern to encapsulate class creation logic
+    Фабрика для создания различных типов занятий с настройками по умолчанию
+    Использует паттерн Factory для инкапсуляции логики создания занятий
     """
 
-    # Default durations for different class types (in minutes)
+    # Длительность по умолчанию для разных типов занятий (в минутах)
     DEFAULT_DURATIONS: Dict[str, int] = {
         'yoga': 60,
         'йога': 60,
@@ -43,7 +43,7 @@ class ClassFactory:
         'стретчинг': 60,
     }
 
-    # Default capacities for different class types
+    # Вместимость по умолчанию для разных типов занятий
     DEFAULT_CAPACITIES: Dict[str, int] = {
         'yoga': 15,
         'йога': 15,
@@ -75,22 +75,22 @@ class ClassFactory:
         **kwargs
     ) -> Class:
         """
-        Create a class instance with smart defaults based on class type
+        Создать экземпляр занятия с умными настройками по умолчанию на основе типа занятия
 
         Args:
-            class_type: Type of the class
-            trainer: Assigned trainer
-            room: Room where class takes place
-            datetime_obj: Date and time of the class
-            check_conflicts: Whether to check for scheduling conflicts
-            save: Whether to save the instance to database
-            **kwargs: Override default settings (duration_minutes, max_capacity, status, notes)
+            class_type: Тип занятия
+            trainer: Назначенный тренер
+            room: Зал, где проходит занятие
+            datetime_obj: Дата и время занятия
+            check_conflicts: Проверять ли конфликты в расписании
+            save: Сохранять ли экземпляр в базу данных
+            **kwargs: Переопределить настройки по умолчанию (duration_minutes, max_capacity, status, notes)
 
         Returns:
-            Class instance
+            Экземпляр занятия (Class)
 
         Raises:
-            ClassConflictError: If there's a scheduling conflict and check_conflicts=True
+            ClassConflictError: Если есть конфликт в расписании и check_conflicts=True
         """
         # Determine default duration
         class_type_name = class_type.name.lower()
@@ -130,12 +130,12 @@ class ClassFactory:
 
     @classmethod
     def _get_default_duration(cls, class_type_name: str) -> int:
-        """Get default duration for class type"""
+        """Получить длительность по умолчанию для типа занятия"""
         return cls.DEFAULT_DURATIONS.get(class_type_name, 60)
 
     @classmethod
     def _get_default_capacity(cls, class_type_name: str) -> int:
-        """Get default capacity for class type"""
+        """Получить вместимость по умолчанию для типа занятия"""
         return cls.DEFAULT_CAPACITIES.get(class_type_name, 15)
 
     @classmethod
@@ -148,17 +148,17 @@ class ClassFactory:
         exclude_id: Optional[int] = None
     ) -> None:
         """
-        Check for scheduling conflicts with trainer and room
+        Проверить конфликты в расписании тренера и зала
 
         Args:
-            trainer: Trainer to check
-            room: Room to check
-            datetime_obj: Start time
-            duration_minutes: Duration in minutes
-            exclude_id: Class ID to exclude from check (for updates)
+            trainer: Тренер для проверки
+            room: Зал для проверки
+            datetime_obj: Время начала
+            duration_minutes: Длительность в минутах
+            exclude_id: ID занятия, которое нужно исключить из проверки (для обновлений)
 
         Raises:
-            ClassConflictError: If conflict is found
+            ClassConflictError: Если найден конфликт
         """
         end_time = datetime_obj + timedelta(minutes=duration_minutes)
 
@@ -215,10 +215,10 @@ class ClassFactory:
         duration_minutes: int
     ) -> Tuple[bool, Optional[str]]:
         """
-        Check if trainer and room are available (non-throwing version)
+        Проверить, свободны ли тренер и зал (версия без выброса исключений)
 
         Returns:
-            Tuple of (is_available, conflict_message)
+            Кортеж (доступно_ли, сообщение_о_конфликте)
         """
         try:
             cls._check_conflicts(trainer, room, datetime_obj, duration_minutes)
@@ -228,7 +228,7 @@ class ClassFactory:
 
     @classmethod
     def create_yoga_class(cls, trainer: Trainer, room: Room, datetime_obj: datetime, **kwargs) -> Class:
-        """Quick create yoga class"""
+        """Быстрое создание занятия йогой"""
         class_type = ClassType.objects.filter(name__iexact='yoga').first()
         if not class_type:
             raise ValueError("ClassType 'Yoga' не найден. Создайте его в админке.")
@@ -236,7 +236,7 @@ class ClassFactory:
 
     @classmethod
     def create_fitness_class(cls, trainer: Trainer, room: Room, datetime_obj: datetime, **kwargs) -> Class:
-        """Quick create fitness class"""
+        """Быстрое создание занятия фитнесом"""
         class_type = ClassType.objects.filter(name__iexact='fitness').first()
         if not class_type:
             raise ValueError("ClassType 'Fitness' не найден. Создайте его в админке.")
@@ -244,7 +244,7 @@ class ClassFactory:
 
     @classmethod
     def create_boxing_class(cls, trainer: Trainer, room: Room, datetime_obj: datetime, **kwargs) -> Class:
-        """Quick create boxing class"""
+        """Быстрое создание занятия боксом"""
         class_type = ClassType.objects.filter(name__iexact='boxing').first()
         if not class_type:
             raise ValueError("ClassType 'Boxing' не найден. Создайте его в админке.")

@@ -9,57 +9,57 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-# Subject (Observable)
+# Subject (Наблюдаемый объект)
 class Subject(ABC):
     """
-    Subject that observers can subscribe to
+    Субъект, на который могут подписаться наблюдатели
     """
 
     def __init__(self):
         self._observers: List[Observer] = []
 
     def attach(self, observer: 'Observer') -> None:
-        """Attach an observer"""
+        """Прикрепить наблюдателя"""
         if observer not in self._observers:
             self._observers.append(observer)
 
     def detach(self, observer: 'Observer') -> None:
-        """Detach an observer"""
+        """Открепить наблюдателя"""
         if observer in self._observers:
             self._observers.remove(observer)
 
     def notify(self, event: str, data: Dict[str, Any]) -> None:
-        """Notify all observers about an event"""
+        """Уведомить всех наблюдателей о событии"""
         for observer in self._observers:
             observer.update(event, data)
 
 
-# Observer Interface
+# Интерфейс Observer (Наблюдатель)
 class Observer(ABC):
     """
-    Observer interface
+    Интерфейс наблюдателя
     """
 
     @abstractmethod
     def update(self, event: str, data: Dict[str, Any]) -> None:
         """
-        Receive update from subject
+        Получить обновление от субъекта
 
         Args:
-            event: Name of the event
-            data: Event data
+            event: Название события
+            data: Данные события
         """
         pass
 
 
-# Concrete Observers
+# Конкретные наблюдатели
 class EmailNotifier(Observer):
     """
-    Send email notifications
+    Отправка email уведомлений
     """
 
     def update(self, event: str, data: Dict[str, Any]) -> None:
-        """Send email based on event"""
+        """Отправить email в зависимости от события"""
         if event == 'payment_completed':
             self._send_payment_confirmation(data)
         elif event == 'booking_created':
@@ -70,7 +70,7 @@ class EmailNotifier(Observer):
             self._send_membership_expiring(data)
 
     def _send_payment_confirmation(self, data: Dict[str, Any]) -> None:
-        """Send payment confirmation email"""
+        """Отправить email подтверждения оплаты"""
         user_email = data.get('user_email')
         amount = data.get('amount')
         membership_type = data.get('membership_type')
@@ -95,7 +95,7 @@ class EmailNotifier(Observer):
         )
 
     def _send_booking_confirmation(self, data: Dict[str, Any]) -> None:
-        """Send booking confirmation email"""
+        """Отправить email подтверждения бронирования"""
         user_email = data.get('user_email')
         class_name = data.get('class_name')
         class_datetime = data.get('class_datetime')
@@ -121,7 +121,7 @@ class EmailNotifier(Observer):
         )
 
     def _send_booking_reminder(self, data: Dict[str, Any]) -> None:
-        """Send booking reminder (2 hours before)"""
+        """Отправить напоминание о занятии (за 2 часа)"""
         user_email = data.get('user_email')
         class_name = data.get('class_name')
         class_datetime = data.get('class_datetime')
@@ -147,7 +147,7 @@ class EmailNotifier(Observer):
         )
 
     def _send_membership_expiring(self, data: Dict[str, Any]) -> None:
-        """Send membership expiring notification"""
+        """Отправить уведомление об истечении абонемента"""
         user_email = data.get('user_email')
         days_remaining = data.get('days_remaining')
 
@@ -213,31 +213,31 @@ class SMSNotifier(Observer):
 
 class AnalyticsLogger(Observer):
     """
-    Log events for analytics
+    Логирование событий для аналитики
     """
 
     def update(self, event: str, data: Dict[str, Any]) -> None:
-        """Log event to analytics"""
-        # TODO: Implement analytics logging
+        """Залогировать событие в аналитику"""
+        # TODO: Реализовать логирование аналитики
         import logging
         logger = logging.getLogger('analytics')
         logger.info(f"Event: {event}, Data: {data}")
 
 
-# Concrete Subject Example
+# Пример конкретного субъекта
 class PaymentSubject(Subject):
     """
-    Subject for payment events
+    Субъект для событий оплаты
     """
 
     def __init__(self):
         super().__init__()
-        # Attach default observers
+        # Прикрепляем наблюдателей по умолчанию
         self.attach(EmailNotifier())
         self.attach(AnalyticsLogger())
 
     def payment_completed(self, user_email: str, amount: float, membership_type: str) -> None:
-        """Notify about completed payment"""
+        """Уведомить о завершенной оплате"""
         self.notify('payment_completed', {
             'user_email': user_email,
             'amount': amount,
